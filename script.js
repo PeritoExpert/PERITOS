@@ -106,13 +106,12 @@ function calculateGlobalScore(sectionScores) {
 
 function generateRecommendations(scores) {
     const recs = [];
-    if (scores[4] < 70) recs.push("🔴 Revisar el sistema de fugas de fluidos. Se detectaron fugas que pueden comprometer la seguridad y el rendimiento del motor.");
-    if (scores[7] < 70) recs.push("🔧 Realizar un diagnóstico profundo del motor. La compresión o el escaneo OBD-II muestran anomalías.");
-    if (scores[5] < 60) recs.push("💡 Inspeccionar el sistema eléctrico. Faros, luces o componentes eléctricos presentan fallas.");
-    if (scores[9] < 60) recs.push("🛞 Revisar el tren delantero y suspensión. Se encontraron componentes en estado regular o malo.");
-    if (scores[6] < 70) recs.push("🚗 Evaluar la carrocería. Se observaron rayones, abolladuras o posibles trabajos de masilla.");
-    if (scores[12] < 60) recs.push("🏁 Realizar una prueba de ruta más exhaustiva. La maniobrabilidad o el frenado presentan deficiencias.");
-    if (recs.length === 0) recs.push("✅ El vehículo se encuentra en óptimas condiciones generales. Mantener el mantenimiento preventivo.");
+    if (scores[4] < 70) recs.push("🔴 Revisar el sistema de fugas de fluidos.");
+    if (scores[7] < 70) recs.push("🔧 Realizar un diagnóstico profundo del motor.");
+    if (scores[5] < 60) recs.push("💡 Inspeccionar el sistema eléctrico.");
+    if (scores[9] < 60) recs.push("🛞 Revisar el tren delantero y suspensión.");
+    if (scores[6] < 70) recs.push("🚗 Evaluar la carrocería.");
+    if (recs.length === 0) recs.push("✅ El vehículo se encuentra en óptimas condiciones.");
     return recs;
 }
 
@@ -157,9 +156,7 @@ function generateReport() {
         <div class="header">
             <div class="header-content">
                 <div class="logo-container">
-                    <div class="logo-img">
-                        <img src="peritologo.png" alt="PeritoExpert" onerror="this.parentElement.innerHTML='PE'">
-                    </div>
+                    <div class="logo-img">PE</div>
                     <div class="logo-text">PERITOEXPERT<span>SISTEMA DE EVALUACIÓN</span></div>
                 </div>
                 <h1 class="report-title">Informe de Inspección Técnica</h1>
@@ -241,8 +238,8 @@ function generateReport() {
         <div class="approval-criteria">
             <h3 class="criteria-title">Criterio de Aprobación</h3>
             <div class="criteria-grid">
-                <div class="criteria-item approved"><div class="criteria-icon">✓</div><div class="criteria-text"><strong>Aprobado</strong><br>Puntuación mayor a 75%</div></div>
-                <div class="criteria-item rejected"><div class="criteria-icon">✗</div><div class="criteria-text"><strong>No Aprobado</strong><br>Puntuación menor a 75%</div></div>
+                <div class="criteria-item approved"><div class="criteria-icon">✓</div><div class="criteria-text"><strong>Aprobado</strong><br>Puntuación ≥ 75%</div></div>
+                <div class="criteria-item rejected"><div class="criteria-icon">✗</div><div class="criteria-text"><strong>No Aprobado</strong><br>Puntuación &lt; 75%</div></div>
             </div>
         </div>
         
@@ -252,7 +249,7 @@ function generateReport() {
             <div class="signature-box"><div>Firma del Cliente</div><div class="signature-line"></div><div>Nombre: ____________________</div><div>CC/NIT: ____________________</div></div>
         </div>
         
-        <div class="footer">
+         <div class="footer">
             <div class="footer-info">
                 <div>PERITOEXPERT</div>
                 <div>Teléfono: 315 715 2606</div>
@@ -393,7 +390,6 @@ function generateReport() {
     loadReportImages();
     animateCommercialValues();
     
-    // Configurar evento para el porcentaje editable
     const scoreInput = document.getElementById('globalScoreInput');
     if (scoreInput) {
         scoreInput.addEventListener('input', function() {
@@ -443,10 +439,10 @@ function generateDetailedSectionsHTML(scores) {
             <div class="subsection">
                 <h3>${sectionNames[sec]} ${isCritical ? '<span style="color: var(--bad);">(Crítica)</span>' : ''}</h3>
                 <div class="color-legend">
-                    <div class="legend-item"><div class="legend-color green"></div><span data-tooltip="Perfecto estado, sin novedad">Bueno</span></div>
-                    <div class="legend-item"><div class="legend-color yellow"></div><span data-tooltip="Rayones, pequeños golpes o desgaste leve">Regular</span></div>
-                    <div class="legend-item"><div class="legend-color red"></div><span data-tooltip="Masilla, reparaciones o daños estructurales">Malo</span></div>
-                    <div class="legend-item"><div class="legend-color gray"></div><span>No Aplica</span></div>
+                    <div class="legend-item"><div class="legend-color green"></div><span>Bueno</span></div>
+                    <div class="legend-item"><div class="legend-color yellow"></div><span>Regular</span></div>
+                    <div class="legend-item"><div class="legend-color red"></div><span>Malo</span></div>
+                    <div class="legend-item"><div class="legend-color gray"></div><span>N/A</span></div>
                 </div>
                 <div class="${sec === 6 || sec === 5 || sec === 9 || sec === 10 ? 'checklist-full' : 'checklist'}">
                     ${generateChecklistItems(sec)}
@@ -469,12 +465,12 @@ function generateChecklistItems(sectionId) {
         const el = document.getElementById(q.id);
         if (!el) return;
         const val = el.value;
-        let statusClass = '', statusText = '', tooltip = '';
-        if (val === 'Bueno' || val === 'Sí') { statusClass = 'status-good'; statusText = '✓'; tooltip = 'Perfecto estado, sin novedad'; }
-        else if (val === 'Regular') { statusClass = 'status-regular'; statusText = '~'; tooltip = 'Rayones, pequeños golpes o desgaste leve'; }
-        else if (val === 'Malo' || val === 'No') { statusClass = 'status-bad'; statusText = '✗'; tooltip = 'Masilla, reparaciones o daños estructurales'; }
-        else { statusClass = 'status-na'; statusText = 'N/A'; tooltip = 'No aplica'; }
-        html += `<div class="check-item"><div class="status ${statusClass}" data-tooltip="${tooltip}">${statusText}</div><div>${q.text}</div></div>`;
+        let statusClass = '', statusText = '';
+        if (val === 'Bueno' || val === 'Sí') { statusClass = 'status-good'; statusText = '✓'; }
+        else if (val === 'Regular') { statusClass = 'status-regular'; statusText = '~'; }
+        else if (val === 'Malo' || val === 'No') { statusClass = 'status-bad'; statusText = '✗'; }
+        else { statusClass = 'status-na'; statusText = 'N/A'; }
+        html += `<div class="check-item"><div class="status ${statusClass}">${statusText}</div><div>${q.text}</div></div>`;
     });
     return html;
 }
@@ -532,89 +528,148 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function saveAsPDF() {
+// NUEVA FUNCIÓN - Guardar como PDF usando html2canvas (SIN PÁGINAS EN BLANCO)
+async function saveAsImageAndPDF() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
-    
-    const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `Peritaje_${plate}_${date}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            letterRendering: true,
-            backgroundColor: '#ffffff',
-            logging: false
-        },
-        jsPDF: { 
-            unit: 'in', 
-            format: 'ledger',
-            orientation: 'portrait'
-        }
-    };
     
     const btn = event.currentTarget;
     const originalHTML = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
     btn.disabled = true;
     
-    html2pdf().set(opt).from(element).save().then(() => {
+    // Ocultar botones temporalmente
+    const actionButtons = document.querySelector('.action-buttons');
+    if (actionButtons) actionButtons.style.display = 'none';
+    
+    try {
+        // Esperar un momento para que se oculten los botones
+        await new Promise(r => setTimeout(r, 200));
+        
+        // Capturar el elemento como canvas
+        const canvas = await html2canvas(element, {
+            scale: 2.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight
+        });
+        
+        // Crear PDF desde el canvas
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        
+        // Calcular dimensiones para PDF tamaño carta
+        const imgWidth = 210; // mm (tamaño carta)
+        const pageHeight = 297; // mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let pdf = new jsPDF({
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        });
+        
+        let position = 0;
+        let heightLeft = imgHeight;
+        
+        // Agregar primera página
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        // Agregar páginas adicionales si es necesario
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+        
+        // Guardar PDF
+        pdf.save(`Peritaje_${plate}_${date}.pdf`);
+        
+        // Restaurar botones
+        if (actionButtons) actionButtons.style.display = 'flex';
         btn.innerHTML = originalHTML;
         btn.disabled = false;
-    }).catch((error) => {
+        
+    } catch (error) {
         console.error('Error:', error);
+        if (actionButtons) actionButtons.style.display = 'flex';
         btn.innerHTML = originalHTML;
         btn.disabled = false;
         alert('Error al generar PDF. Por favor intente nuevamente.');
-    });
+    }
 }
 
-// NUEVA FUNCIÓN: Guardar en el teléfono (descarga directa)
-function saveToDevice() {
+// Función para guardar en el teléfono (también usa html2canvas)
+async function saveToDevice() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
     
-    // Mostrar notificación de carga
     const btn = event.currentTarget;
     const originalHTML = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
     btn.disabled = true;
     
-    // Opciones para el PDF (formato más compatible con móviles)
-    const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `Peritaje_${plate}_${date}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2.5, // Mayor escala para mejor calidad en móviles
-            useCORS: true, 
-            letterRendering: true,
+    const actionButtons = document.querySelector('.action-buttons');
+    if (actionButtons) actionButtons.style.display = 'none';
+    
+    try {
+        await new Promise(r => setTimeout(r, 200));
+        
+        const canvas = await html2canvas(element, {
+            scale: 2.5,
+            useCORS: true,
             backgroundColor: '#ffffff',
             logging: false,
             windowWidth: element.scrollWidth,
             windowHeight: element.scrollHeight
-        },
-        jsPDF: { 
-            unit: 'in', 
-            format: 'a4', // Cambiamos a A4 para mejor compatibilidad en móviles
+        });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let pdf = new jsPDF({
+            unit: 'mm',
+            format: 'a4',
             orientation: 'portrait'
+        });
+        
+        let position = 0;
+        let heightLeft = imgHeight;
+        
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
         }
-    };
-    
-    html2pdf().set(opt).from(element).save().then(() => {
+        
+        pdf.save(`Peritaje_${plate}_${date}.pdf`);
+        
+        if (actionButtons) actionButtons.style.display = 'flex';
         btn.innerHTML = originalHTML;
         btn.disabled = false;
-        // Mostrar mensaje de éxito
-        alert('✅ Informe guardado exitosamente en tu dispositivo.\n\nRevisa la carpeta de Descargas.');
-    }).catch((error) => {
+        alert('✅ Informe guardado exitosamente en tu dispositivo.');
+        
+    } catch (error) {
         console.error('Error:', error);
+        if (actionButtons) actionButtons.style.display = 'flex';
         btn.innerHTML = originalHTML;
         btn.disabled = false;
-        alert('❌ Error al guardar el informe. Por favor intenta nuevamente.');
-    });
+        alert('❌ Error al guardar el informe.');
+    }
 }
 
 function printReport() { 
