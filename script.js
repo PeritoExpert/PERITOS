@@ -178,7 +178,7 @@ function generateReport() {
                     <input type="number" id="globalScoreInput" value="${globalScore}" min="0" max="100" step="1">
                     <span>%</span>
                 </div>
-                <div class="summary-label">Puntaje Global (Editable)</div>
+                <div class="summary-label">Puntaje Global</div>
             </div>
         </div>
         
@@ -241,8 +241,8 @@ function generateReport() {
         <div class="approval-criteria">
             <h3 class="criteria-title">Criterio de Aprobación</h3>
             <div class="criteria-grid">
-                <div class="criteria-item approved"><div class="criteria-icon">✓</div><div class="criteria-text"><strong>Aprobado</strong><br>Puntuación ≥ 75%</div></div>
-                <div class="criteria-item rejected"><div class="criteria-icon">✗</div><div class="criteria-text"><strong>No Aprobado</strong><br>Puntuación &lt; 75%</div></div>
+                <div class="criteria-item approved"><div class="criteria-icon">✓</div><div class="criteria-text"><strong>Aprobado</strong><br>Puntuación mayor a 75%</div></div>
+                <div class="criteria-item rejected"><div class="criteria-icon">✗</div><div class="criteria-text"><strong>No Aprobado</strong><br>Puntuación menor a 75%</div></div>
             </div>
         </div>
         
@@ -255,9 +255,9 @@ function generateReport() {
         <div class="footer">
             <div class="footer-info">
                 <div>PERITOEXPERT</div>
-                <div>Teléfono: 315 2207097</div>
-                <div>Email: info@peritoexpert.com</div>
-                <div>WEB: www.peritoexpert.com</div>
+                <div>Teléfono: 315 715 2606</div>
+                <div>Email: peritoexpert.bogota@gmail.com</div>
+                <div>WEB: www.peritoexpert.com.co</div>
             </div>
             <div>Este informe es confidencial y propiedad de PERITOEXPERT. La evaluación se basa en una inspección visual y pruebas funcionales al momento de la revisión.</div>
         </div>
