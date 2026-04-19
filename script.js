@@ -175,7 +175,7 @@ function generateReport() {
                     <input type="number" id="globalScoreInput" value="${globalScore}" min="0" max="100" step="1">
                     <span>%</span>
                 </div>
-                <div class="summary-label">Puntaje Global</div>
+                <div class="summary-label">Puntaje Global (Editable)</div>
             </div>
         </div>
         
@@ -249,7 +249,7 @@ function generateReport() {
             <div class="signature-box"><div>Firma del Cliente</div><div class="signature-line"></div><div>Nombre: ____________________</div><div>CC/NIT: ____________________</div></div>
         </div>
         
-         <div class="footer">
+        <div class="footer">
             <div class="footer-info">
                 <div>PERITOEXPERT</div>
                 <div>Teléfono: 315 715 2606</div>
@@ -259,122 +259,12 @@ function generateReport() {
             <div>Este informe es confidencial y propiedad de PERITOEXPERT. La evaluación se basa en una inspección visual y pruebas funcionales al momento de la revisión.</div>
         </div>
         
-        <!-- TÉRMINOS Y CONDICIONES COMPLETOS -->
         <div class="legal-clauses">
             <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #d1ecf1; background-color: #f8f9fa;">
-                <h6 style="font-size: 8.5px; color: var(--f1-red); margin-bottom: 5px; font-weight: bold; text-align: center; text-transform: uppercase;">
-                    DECLARACIONES, AUTORIZACIONES Y CONDICIONES DEL SERVICIO
-                </h6>
-                <p style="font-size: 8.5px; color: #333; margin-bottom: 5px; text-align: center; font-weight: bold;">
-                    PERITOEXPERT
-                </p>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Declaración de veracidad y procedencia del vehículo</p>
-                    <p style="margin: 2px 0; text-align: justify;">Declaro bajo gravedad de juramento que toda la información y documentación suministrada a PERITOEXPERT es veraz, completa y corresponde a la realidad. Así mismo, manifiesto que el vehículo presentado para la inspección es de procedencia lícita. En consecuencia, asumo de manera exclusiva cualquier responsabilidad de tipo penal, civil, administrativa o fiscal que se derive de esta orden de trabajo, eximiendo a PERITOEXPERT de cualquier responsabilidad por información falsa, incompleta u omitida.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Autorización para consulta de información</p>
-                    <p style="margin: 2px 0; text-align: justify;">Autorizo expresa e irrevocablemente a PERITOEXPERT para consultar mi información personal y la del vehículo en el Registro Único Nacional de Tránsito (RUNT), así como en otras entidades públicas o privadas afiliadas o relacionadas, con el fin de solicitar, consultar y validar la información del vehículo identificado con la placa consignada en el informe de inspección.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Prestación del servicio</p>
-                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT presta al cliente el servicio de peritaje automotriz, el cual puede incluir inspección técnica, validación de asegurabilidad y avalúo comercial referencial, de acuerdo con el alcance contratado y las condiciones establecidas en el presente informe.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Inspección de asegurabilidad</p>
-                    <p style="margin: 2px 0; text-align: justify;">La empresa se compromete a realizar la inspección de asegurabilidad del vehículo conforme a los criterios técnicos, protocolos internos y convenios vigentes con las compañías aseguradoras, cuando aplique, aclarando que el dictamen emitido corresponde exclusivamente al estado observable del vehículo al momento de la inspección.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Avalúo comercial</p>
-                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT se compromete a realizar el avalúo comercial del vehículo conforme a metodologías, referencias del mercado y procedimientos internos establecidos. El resultado del avalúo no compromete a la empresa con la comercialización del automotor, ni constituye una obligación de compra, venta o intermediación.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Notificaciones y reportes</p>
-                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT bajo ninguna circunstancia realizará notificaciones, reportes, alertas o registros ante autoridades, aseguradoras o terceros respecto al vehículo durante la ejecución del peritaje, salvo que exista una obligación legal expresa que así lo exija.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Derecho de suspensión o retiro del vehículo</p>
-                    <p style="margin: 2px 0; text-align: justify;">La empresa se reserva el derecho de suspender la inspección o retirar el vehículo del proceso cuando este represente un riesgo para la seguridad del personal, presente fallas mecánicas graves, condiciones estructurales peligrosas o cualquier situación que pueda comprometer la integridad del vehículo o de los inspectores.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">No realización de reparaciones</p>
-                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT no realiza ningún tipo de reparación, ajuste, mantenimiento ni modificación al vehículo inspeccionado. Todas las pruebas y verificaciones realizadas son únicamente de carácter diagnóstico y observacional.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Resultados del informe</p>
-                    <p style="margin: 2px 0; text-align: justify;">La empresa no emite conceptos, resultados ni conclusiones distintas a las derivadas directamente de la inspección realizada. PERITOEXPERT no recomienda talleres, empresas ni terceros para la reparación o intervención del vehículo.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Interpretación del informe</p>
-                    <p style="margin: 2px 0; text-align: justify;">Los arreglos, reparaciones o decisiones que se deriven del informe de inspección no comprometen a PERITOEXPERT, teniendo en cuenta que el informe puede estar sujeto a diversas interpretaciones técnicas por parte de terceros.</p>
-                </div>
-                
-                <div style="margin-bottom: 6px;">
-                    <p style="margin: 2px 0; font-weight: bold;">Exoneración por daños durante la inspección</p>
-                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT no se hace responsable por daños que se presenten durante la inspección cuando estos se deban a condiciones preexistentes del vehículo, desgaste natural o falta de mantenimiento, incluyendo, pero sin limitarse a: bomba de gasolina eléctrica (por bajo nivel de combustible), correa de repartición (por incumplimiento de mantenimientos recomendados por el fabricante), bobinas electrónicas, guayas de acelerador, embrague, frenos, capó, elementos eléctricos, bombillos de farolas, luces de freno, luces exploradoras, motor, caja o transmisión, así como cualquier otro componente que falle por uso previo o deterioro anterior al ingreso del vehículo al peritaje.</p>
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">SUSPENSIÓN</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> PERITOEXPERT realiza una inspección visual de los componentes visibles del sistema de suspensión.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> La evaluación del estado funcional interno de componentes.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">FRENOS</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Diagnóstico visual y verificación básica del funcionamiento del pedal de freno.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> La determinación del nivel de desgaste de pastillas o zapatas.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">DIRECCIÓN</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Verificación visual de fugas de aceite en la caja de dirección.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> Mediciones de alineación.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">LLANTAS Y RINES</h6>
-                <p style="margin: 2px 0;">Se inspecciona el estado del labrado de las llantas. PERITOEXPERT no valida si los rines presentan procesos previos de rectificación.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">SISTEMA ELÉCTRICO</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Se verifica el funcionamiento observable de los sistemas eléctricos.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> La determinación de vida útil de componentes eléctricos.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">TRANSMISIÓN DE POTENCIA</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Inspección visual de fugas de fluidos en diferencial y caja de transmisión.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> La validación del funcionamiento interno de la caja de velocidades.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">CHASIS Y CARROCERÍA</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Revisión visual de puntas de chasis y estructura.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> Medición de cotas estructurales.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">MOTOR</h6>
-                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Revisión visual de fugas de fluidos y niveles.</p>
-                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> Evaluación de desgaste interno.</p>
-            </div>
-            
-            <div style="margin-bottom: 8px;">
-                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">VALORES COMERCIALES</h6>
-                <p style="margin: 2px 0;">Los valores entregados son referenciales, basados en fuentes del mercado colombiano.</p>
+                <h6 style="font-size: 8.5px; color: #e10600; margin-bottom: 5px; font-weight: bold; text-align: center;">DECLARACIONES, AUTORIZACIONES Y CONDICIONES DEL SERVICIO</h6>
+                <p style="font-size: 8.5px; text-align: justify;"><strong>Declaración de veracidad:</strong> Declaro que toda la información suministrada es veraz y completa.</p>
+                <p style="font-size: 8.5px; text-align: justify;"><strong>Autorización:</strong> Autorizo a PERITOEXPERT para consultar información en el RUNT.</p>
+                <p style="font-size: 8.5px; text-align: justify;"><strong>Alcance:</strong> El peritaje se basa en una inspección visual al momento de la revisión.</p>
             </div>
         </div>
         
@@ -528,8 +418,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// NUEVA FUNCIÓN - Guardar como PDF usando html2canvas (SIN PÁGINAS EN BLANCO)
-async function saveAsImageAndPDF() {
+// FUNCIÓN PRINCIPAL - Guardar como PDF (USANDO html2canvas + jspdf)
+async function saveAsPDF() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
@@ -539,15 +429,13 @@ async function saveAsImageAndPDF() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
     btn.disabled = true;
     
-    // Ocultar botones temporalmente
+    // Ocultar botones temporalmente para que no salgan en el PDF
     const actionButtons = document.querySelector('.action-buttons');
     if (actionButtons) actionButtons.style.display = 'none';
     
     try {
-        // Esperar un momento para que se oculten los botones
         await new Promise(r => setTimeout(r, 200));
         
-        // Capturar el elemento como canvas
         const canvas = await html2canvas(element, {
             scale: 2.5,
             useCORS: true,
@@ -557,13 +445,11 @@ async function saveAsImageAndPDF() {
             windowHeight: element.scrollHeight
         });
         
-        // Crear PDF desde el canvas
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const { jsPDF } = window.jspdf;
         
-        // Calcular dimensiones para PDF tamaño carta
-        const imgWidth = 210; // mm (tamaño carta)
-        const pageHeight = 297; // mm
+        const imgWidth = 210;
+        const pageHeight = 297;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
         let pdf = new jsPDF({
@@ -575,11 +461,9 @@ async function saveAsImageAndPDF() {
         let position = 0;
         let heightLeft = imgHeight;
         
-        // Agregar primera página
         pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
         
-        // Agregar páginas adicionales si es necesario
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
             pdf.addPage();
@@ -587,10 +471,8 @@ async function saveAsImageAndPDF() {
             heightLeft -= pageHeight;
         }
         
-        // Guardar PDF
         pdf.save(`Peritaje_${plate}_${date}.pdf`);
         
-        // Restaurar botones
         if (actionButtons) actionButtons.style.display = 'flex';
         btn.innerHTML = originalHTML;
         btn.disabled = false;
@@ -604,7 +486,7 @@ async function saveAsImageAndPDF() {
     }
 }
 
-// Función para guardar en el teléfono (también usa html2canvas)
+// Función para guardar en el teléfono
 async function saveToDevice() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
