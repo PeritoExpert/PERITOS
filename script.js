@@ -175,7 +175,7 @@ function generateReport() {
                     <input type="number" id="globalScoreInput" value="${globalScore}" min="0" max="100" step="1">
                     <span>%</span>
                 </div>
-                <div class="summary-label">Puntaje Global (Editable)</div>
+                <div class="summary-label">Puntaje Global</div>
             </div>
         </div>
         
@@ -418,8 +418,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// FUNCIÓN PRINCIPAL - Guardar como PDF (USANDO html2canvas + jspdf)
-async function saveAsPDF() {
+// FUNCIÓN CORREGIDA PARA iOS - Guardar PDF usando html2pdf.js (compatible con iPhone)
+function saveAsPDF() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
@@ -429,65 +429,51 @@ async function saveAsPDF() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
     btn.disabled = true;
     
-    // Ocultar botones temporalmente para que no salgan en el PDF
+    // Ocultar botones temporalmente
     const actionButtons = document.querySelector('.action-buttons');
     if (actionButtons) actionButtons.style.display = 'none';
     
-    try {
-        await new Promise(r => setTimeout(r, 200));
-        
-        const canvas = await html2canvas(element, {
-            scale: 2.5,
+    // Configuración OPTIMIZADA para iOS
+    const opt = {
+        margin: [0.3, 0.3, 0.3, 0.3],
+        filename: `Peritaje_${plate}_${date}.pdf`,
+        image: { type: 'jpeg', quality: 0.92 },
+        html2canvas: { 
+            scale: 1.8,
             useCORS: true,
+            letterRendering: true,
             backgroundColor: '#ffffff',
             logging: false,
+            allowTaint: false,
             windowWidth: element.scrollWidth,
             windowHeight: element.scrollHeight
-        });
-        
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const { jsPDF } = window.jspdf;
-        
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        let pdf = new jsPDF({
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        });
-        
-        let position = 0;
-        let heightLeft = imgHeight;
-        
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: 'letter',
+            orientation: 'portrait',
+            compress: true
         }
-        
-        pdf.save(`Peritaje_${plate}_${date}.pdf`);
-        
-        if (actionButtons) actionButtons.style.display = 'flex';
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-        
-    } catch (error) {
-        console.error('Error:', error);
-        if (actionButtons) actionButtons.style.display = 'flex';
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-        alert('Error al generar PDF. Por favor intente nuevamente.');
-    }
+    };
+    
+    // Pequeño retraso para iOS
+    setTimeout(() => {
+        html2pdf().set(opt).from(element).save().then(() => {
+            if (actionButtons) actionButtons.style.display = 'flex';
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }).catch((error) => {
+            console.error('Error:', error);
+            if (actionButtons) actionButtons.style.display = 'flex';
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            alert('Error al generar PDF. Por favor intente nuevamente.');
+        });
+    }, 200);
 }
 
-// Función para guardar en el teléfono
-async function saveToDevice() {
+// Función para guardar en el teléfono (también optimizada para iOS)
+function saveToDevice() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
@@ -500,58 +486,42 @@ async function saveToDevice() {
     const actionButtons = document.querySelector('.action-buttons');
     if (actionButtons) actionButtons.style.display = 'none';
     
-    try {
-        await new Promise(r => setTimeout(r, 200));
-        
-        const canvas = await html2canvas(element, {
-            scale: 2.5,
+    const opt = {
+        margin: [0.3, 0.3, 0.3, 0.3],
+        filename: `Peritaje_${plate}_${date}.pdf`,
+        image: { type: 'jpeg', quality: 0.92 },
+        html2canvas: { 
+            scale: 1.8,
             useCORS: true,
+            letterRendering: true,
             backgroundColor: '#ffffff',
             logging: false,
+            allowTaint: false,
             windowWidth: element.scrollWidth,
             windowHeight: element.scrollHeight
-        });
-        
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const { jsPDF } = window.jspdf;
-        
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        let pdf = new jsPDF({
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        });
-        
-        let position = 0;
-        let heightLeft = imgHeight;
-        
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: 'letter',
+            orientation: 'portrait',
+            compress: true
         }
-        
-        pdf.save(`Peritaje_${plate}_${date}.pdf`);
-        
-        if (actionButtons) actionButtons.style.display = 'flex';
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-        alert('✅ Informe guardado exitosamente en tu dispositivo.');
-        
-    } catch (error) {
-        console.error('Error:', error);
-        if (actionButtons) actionButtons.style.display = 'flex';
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-        alert('❌ Error al guardar el informe.');
-    }
+    };
+    
+    setTimeout(() => {
+        html2pdf().set(opt).from(element).save().then(() => {
+            if (actionButtons) actionButtons.style.display = 'flex';
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            alert('✅ Informe guardado exitosamente en tu dispositivo.');
+        }).catch((error) => {
+            console.error('Error:', error);
+            if (actionButtons) actionButtons.style.display = 'flex';
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            alert('❌ Error al guardar el informe. Por favor intente nuevamente.');
+        });
+    }, 200);
 }
 
 function printReport() { 
