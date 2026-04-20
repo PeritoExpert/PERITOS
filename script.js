@@ -13,6 +13,112 @@ const sectionNames = {
     7: 'Motor', 8: 'Llantas', 9: 'Suspensión', 10: 'Interior', 11: 'Accesorios', 12: 'Prueba Ruta'
 };
 
+// ============================================================
+// TEXTOS PERSONALIZABLES PARA LOS TOOLTIPS DE CADA SECCIÓN
+// ============================================================
+
+const tooltipTexts = {
+    default: {
+        Bueno: "✅ Perfecto estado, sin novedad. La pieza funciona correctamente.",
+        Regular: "⚠️ Regular: Se observan rayones, pequeños golpes o desgaste leve. Requiere atención menor.",
+        Malo: "❌ Malo: Presencia de masilla, reparaciones previas o daños estructurales. Requiere reparación.",
+        "N/A": "⚪ No aplica: Esta característica no está presente en el vehículo."
+    },
+    
+    // SECCIÓN 2: DOCUMENTACIÓN
+    2: {
+        Bueno: "✅ Documentación en regla y vigente. Todo en orden.",
+        Regular: "⚠️ Documentación con observaciones pendientes. Revisar fechas.",
+        Malo: "❌ Documentación faltante o vencida. Requiere actualización urgente.",
+        "N/A": "⚪ No aplica para este vehículo."
+    },
+    
+    // SECCIÓN 4: FUGAS DE FLUIDOS
+    4: {
+        Bueno: "✅ SIN FUGAS: El sistema está completamente sellado y en perfecto estado. No se detectan pérdidas de fluidos.",
+        Regular: "⚠️ HUMEDAD: Se observan leves manchas de humedad o sudoración. Monitorear periódicamente. No representa fuga activa.",
+        Malo: "❌ FUGA ACTIVA: Se detecta pérdida visible de fluido. Requiere reparación inmediata.",
+        "N/A": "⚪ Componente no presente en el vehículo."
+    },
+    
+    // SECCIÓN 5: SISTEMA ELÉCTRICO
+    5: {
+        Bueno: "✅ SISTEMA ÓPTIMO: Todos los componentes eléctricos funcionan correctamente sin novedad.",
+        Regular: "⚠️ DESGASTE: Algunos componentes presentan desgaste leve o funcionan intermitentemente.",
+        Malo: "❌ FALLAS: Fallas eléctricas detectadas. Requiere diagnóstico y reparación urgente.",
+        "N/A": "⚪ Componente no presente en el vehículo."
+    },
+    
+    // SECCIÓN 6: CARROCERÍA
+    6: {
+        Bueno: "✅ PERFECTO: Carrocería en estado impecable. Sin abolladuras, rayones, golpes ni reparaciones.",
+        Regular: "⚠️ RAYONES O REPINTADO: Se observan rayones superficiales, pequeños golpes o evidencia de repintado menor. Sin daño estructural.",
+        Malo: "❌ GOLPES O MASILLA: Presencia de masilla, reparaciones estructurales previas, abolladuras profundas o daños importantes.",
+        "N/A": "⚪ Pieza no presente en el vehículo."
+    },
+    
+    // SECCIÓN 7: MOTOR
+    7: {
+        Bueno: "✅ MOTOR ÓPTIMO: Compresión y escaneo OBD-II en parámetros normales. Funcionamiento excelente.",
+        Regular: "⚠️ IRREGULARIDADES: Motor con pequeñas irregularidades. Requiere mantenimiento preventivo menor.",
+        Malo: "❌ FALLAS GRAVES: Motor con fallas importantes en compresión o códigos OBD-II críticos. Requiere reparación urgente.",
+        "N/A": "⚪ No aplica para este vehículo."
+    },
+    
+    // SECCIÓN 8: LLANTAS
+    8: {
+        Bueno: "✅ LLANTAS ÓPTIMAS: Labrado suficiente, presión adecuada y sin daños visibles.",
+        Regular: "⚠️ DESGASTE IRREGULAR: Llantas con desgaste desigual. Monitorear presión y alineación.",
+        Malo: "❌ LLANTAS DAÑADAS: Llantas muy desgastadas (menos de 1.6mm), con cortes, abultamientos o daños. Requieren reemplazo inmediato.",
+        "N/A": "⚪ No aplica para este vehículo."
+    },
+    
+    // SECCIÓN 9: SUSPENSIÓN
+    9: {
+        Bueno: "✅ SUSPENSIÓN PERFECTA: Sin holguras, ruidos anormales ni fugas. Amortiguación correcta.",
+        Regular: "⚠️ DESGASTE LEVE: Suspensión con leve desgaste. Requiere revisión periódica.",
+        Malo: "❌ SUSPENSIÓN DAÑADA: Fugas de aceite en amortiguadores, componentes sueltos, holguras excesivas o ruidos fuertes.",
+        "N/A": "⚪ Componente no presente en el vehículo."
+    },
+    
+    // SECCIÓN 10: INTERIOR
+    10: {
+        Bueno: "✅ INTERIOR EXCELENTE: Tapicería y componentes funcionales en perfecto estado.",
+        Regular: "⚠️ DESGASTE NORMAL: Interior con desgaste normal por uso. Algunos detalles estéticos menores.",
+        Malo: "❌ INTERIOR DAÑADO: Tapicería rota, desgarrada o componentes no funcionales. Requiere reparación.",
+        "N/A": "⚪ No aplica para este vehículo."
+    },
+    
+    // SECCIÓN 11: ACCESORIOS
+    11: {
+        Bueno: "✅ ACCESORIOS OK: Accesorios instalados y funcionando correctamente.",
+        Regular: "⚠️ ACCESORIOS REGULAR: Accesorios instalados pero con algún detalle estético o funcional menor.",
+        Malo: "❌ ACCESORIOS DAÑADOS: Accesorios dañados o no funcionales. Requieren reparación o reemplazo.",
+        "N/A": "⚪ No aplica para este vehículo."
+    },
+    
+    // SECCIÓN 12: PRUEBA DE RUTA
+    12: {
+        Bueno: "✅ PRUEBA EXITOSA: Comportamiento excelente en aceleración, frenado, dirección y estabilidad.",
+        Regular: "⚠️ IRREGULARIDADES: Pequeñas irregularidades en la prueba de ruta. Requiere revisión menor.",
+        Malo: "❌ FALLAS EN RUTA: Prueba de ruta con fallas importantes en frenado, dirección o suspensión. Requiere revisión mecánica urgente.",
+        "N/A": "⚪ No aplica para este vehículo."
+    }
+};
+
+// Función para obtener el texto del tooltip
+function getTooltipText(sectionId, status) {
+    if (tooltipTexts[sectionId] && tooltipTexts[sectionId][status]) {
+        return tooltipTexts[sectionId][status];
+    }
+    if (tooltipTexts.default && tooltipTexts.default[status]) {
+        return tooltipTexts.default[status];
+    }
+    return status === 'Bueno' ? '✅ Perfecto estado' : 
+           status === 'Regular' ? '⚠️ Estado regular' : 
+           status === 'Malo' ? '❌ Estado malo' : '⚪ No aplica';
+}
+
 // Preguntas por sección
 const sectionQuestions = {
     2: [{ id: "soat", text: "SOAT vigente" }, { id: "propertyCard", text: "Tarjeta de propiedad" }, { id: "accidentsReported", text: "Reporta siniestros" }, { id: "techReview", text: "Rev. Tecnomecánica" }, { id: "hasInsurance", text: "Aseguradora" }],
@@ -106,12 +212,13 @@ function calculateGlobalScore(sectionScores) {
 
 function generateRecommendations(scores) {
     const recs = [];
-    if (scores[4] < 70) recs.push("🔴 Revisar el sistema de fugas de fluidos.");
-    if (scores[7] < 70) recs.push("🔧 Realizar un diagnóstico profundo del motor.");
-    if (scores[5] < 60) recs.push("💡 Inspeccionar el sistema eléctrico.");
-    if (scores[9] < 60) recs.push("🛞 Revisar el tren delantero y suspensión.");
-    if (scores[6] < 70) recs.push("🚗 Evaluar la carrocería.");
-    if (recs.length === 0) recs.push("✅ El vehículo se encuentra en óptimas condiciones.");
+    if (scores[4] < 70) recs.push("🔴 SISTEMA DE FLUIDOS: Se detectaron fugas o humedad que pueden comprometer la seguridad y el rendimiento del motor. Revisar sellos y empaques.");
+    if (scores[7] < 70) recs.push("🔧 DIAGNÓSTICO DE MOTOR: Realizar un diagnóstico profundo del motor. La compresión o el escaneo OBD-II muestran anomalías.");
+    if (scores[5] < 60) recs.push("💡 SISTEMA ELÉCTRICO: Inspeccionar el sistema eléctrico. Faros, luces o componentes presentan fallas.");
+    if (scores[9] < 60) recs.push("🛞 TREN DELANTERO Y SUSPENSIÓN: Revisar componentes de suspensión y dirección. Se encontraron partes en estado regular o malo.");
+    if (scores[6] < 70) recs.push("🚗 CARROCERÍA: Evaluar la carrocería. Se observaron rayones, abolladuras o posibles trabajos de masilla.");
+    if (scores[12] < 60) recs.push("🏁 PRUEBA DE RUTA: Realizar una prueba de ruta más exhaustiva. La maniobrabilidad o el frenado presentan deficiencias.");
+    if (recs.length === 0) recs.push("✅ El vehículo se encuentra en óptimas condiciones generales. Mantener el mantenimiento preventivo.");
     return recs;
 }
 
@@ -144,20 +251,13 @@ function generateReport() {
     let isApproved = globalScore >= 75;
     const recommendations = generateRecommendations(sectionScores);
     
-    const radarLabels = [], radarData = [];
-    for (let i = 2; i <= 12; i++) {
-        if (sectionNames[i] && sectionScores[i] !== undefined) {
-            radarLabels.push(sectionNames[i]);
-            radarData.push(sectionScores[i]);
-        }
-    }
-    
     const reportHTML = `
         <div class="header">
             <div class="header-content">
                 <div class="logo-container">
-                    <div class="logo-img">PE</div>
-                    <div class="logo-text">PERITOEXPERT<span>SISTEMA DE EVALUACIÓN</span></div>
+                    <div class="logo-img">
+                        <img src="peritologo.png" alt="PeritoExpert">
+                    </div>
                 </div>
                 <h1 class="report-title">Informe de Inspección Técnica</h1>
                 <div class="report-number">Peritaje #${Math.floor(Math.random() * 10000)}</div>
@@ -167,7 +267,7 @@ function generateReport() {
         <div class="executive-summary">
             <div class="summary-veredict">
                 <div id="veredictStamp" class="veredict-stamp ${isApproved ? 'approved' : 'rejected'}">${isApproved ? '✅ APROBADO' : '❌ NO APROBADO'}</div>
-                <div style="margin-top: 10px; font-size: 12px;">Según criterios de evaluación</div>
+                <div style="margin-top: 8px; font-size: 11px;">Según criterios de evaluación</div>
             </div>
             <div id="trafficLight" class="traffic-light ${globalScore >= 75 ? 'green' : (globalScore >= 50 ? 'yellow' : 'red')}">${globalScore}%</div>
             <div class="summary-score">
@@ -175,16 +275,16 @@ function generateReport() {
                     <input type="number" id="globalScoreInput" value="${globalScore}" min="0" max="100" step="1">
                     <span>%</span>
                 </div>
-                <div class="summary-label">Puntaje Global</div>
+                <div class="summary-label">Puntaje Global (Editable)</div>
             </div>
         </div>
         
         <div class="vehicle-display">
             <div class="vehicle-photos">
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoFront"></div><div class="photo-label">Frontal</div></div>
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoSide"></div><div class="photo-label">Lateral</div></div>
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoRear"></div><div class="photo-label">Trasera</div></div>
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoEngine"></div><div class="photo-label">Motor</div></div>
+                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoFront" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Frontal</div></div>
+                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoSide" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Lateral</div></div>
+                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoRear" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Trasera</div></div>
+                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoEngine" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Motor</div></div>
             </div>
             <div class="vehicle-info">
                 <h2>Datos del Vehículo</h2>
@@ -213,11 +313,6 @@ function generateReport() {
         <div class="section commercial-values">
             <h2 class="section-title">Valores Comerciales</h2>
             ${generateCommercialValuesHTML()}
-        </div>
-        
-        <div class="radar-chart-container">
-            <h3>Evaluación por Sistemas</h3>
-            <canvas id="radarChart" width="400" height="400"></canvas>
         </div>
         
         <div class="section">
@@ -259,16 +354,18 @@ function generateReport() {
             <div>Este informe es confidencial y propiedad de PERITOEXPERT. La evaluación se basa en una inspección visual y pruebas funcionales al momento de la revisión.</div>
         </div>
         
+        <!-- TÉRMINOS Y CONDICIONES -->
         <div class="legal-clauses">
-            <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #d1ecf1; background-color: #f8f9fa;">
-                <h6 style="font-size: 8.5px; color: #e10600; margin-bottom: 5px; font-weight: bold; text-align: center;">DECLARACIONES, AUTORIZACIONES Y CONDICIONES DEL SERVICIO</h6>
-                <p style="font-size: 8.5px; text-align: justify;"><strong>Declaración de veracidad:</strong> Declaro que toda la información suministrada es veraz y completa.</p>
-                <p style="font-size: 8.5px; text-align: justify;"><strong>Autorización:</strong> Autorizo a PERITOEXPERT para consultar información en el RUNT.</p>
-                <p style="font-size: 8.5px; text-align: justify;"><strong>Alcance:</strong> El peritaje se basa en una inspección visual al momento de la revisión.</p>
+            <div style="margin-bottom: 8px; padding: 6px; border: 1px solid #d1ecf1; background-color: #f8f9fa;">
+                <h6 style="font-size: 8px; color: #e10600; margin-bottom: 4px; font-weight: bold; text-align: center;">DECLARACIONES, AUTORIZACIONES Y CONDICIONES DEL SERVICIO</h6>
+                <p style="font-size: 7px; text-align: center; font-weight: bold;">PERITOEXPERT</p>
+                <div style="margin-bottom: 4px;"><p style="margin: 2px 0; font-weight: bold;">Declaración de veracidad</p><p style="margin: 2px 0; text-align: justify;">Declaro bajo gravedad de juramento que toda la información es veraz y corresponde a la realidad.</p></div>
+                <div style="margin-bottom: 4px;"><p style="margin: 2px 0; font-weight: bold;">Autorización RUNT</p><p style="margin: 2px 0; text-align: justify;">Autorizo a PERITOEXPERT para consultar información en el RUNT y otras entidades.</p></div>
+                <div style="margin-bottom: 4px;"><p style="margin: 2px 0; font-weight: bold;">Exoneración por daños</p><p style="margin: 2px 0; text-align: justify;">PERITOEXPERT no se hace responsable por daños preexistentes o por desgaste natural del vehículo.</p></div>
             </div>
         </div>
         
-        <div class="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 30px 0; flex-wrap: wrap;">
+        <div class="action-buttons">
             <button onclick="printReport()" class="btn-action"><i class="fas fa-print"></i> Imprimir</button>
             <button onclick="saveAsPDF()" class="btn-action btn-pdf"><i class="fas fa-file-pdf"></i> Guardar PDF</button>
             <button onclick="saveToDevice()" class="btn-action btn-save"><i class="fas fa-download"></i> Guardar en el teléfono</button>
@@ -306,18 +403,6 @@ function generateReport() {
         });
     }
     
-    setTimeout(() => {
-        const ctx = document.getElementById('radarChart')?.getContext('2d');
-        if (ctx) {
-            if (radarChart) radarChart.destroy();
-            radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: { labels: radarLabels, datasets: [{ label: 'Puntaje (%)', data: radarData, backgroundColor: 'rgba(225, 6, 0, 0.2)', borderColor: '#e10600', borderWidth: 2, pointBackgroundColor: '#e10600', pointBorderColor: '#fff' }] },
-                options: { responsive: true, maintainAspectRatio: true, scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 20, callback: v => v + '%' } } } }
-            });
-        }
-    }, 100);
-    
     window.scrollTo(0, 0);
 }
 
@@ -329,10 +414,10 @@ function generateDetailedSectionsHTML(scores) {
             <div class="subsection">
                 <h3>${sectionNames[sec]} ${isCritical ? '<span style="color: var(--bad);">(Crítica)</span>' : ''}</h3>
                 <div class="color-legend">
-                    <div class="legend-item"><div class="legend-color green"></div><span>Bueno</span></div>
-                    <div class="legend-item"><div class="legend-color yellow"></div><span>Regular</span></div>
-                    <div class="legend-item"><div class="legend-color red"></div><span>Malo</span></div>
-                    <div class="legend-item"><div class="legend-color gray"></div><span>N/A</span></div>
+                    <div class="legend-item"><div class="legend-color green"></div><span data-tooltip="${getTooltipText(sec, 'Bueno').replace(/"/g, '&quot;')}">Bueno</span></div>
+                    <div class="legend-item"><div class="legend-color yellow"></div><span data-tooltip="${getTooltipText(sec, 'Regular').replace(/"/g, '&quot;')}">Regular</span></div>
+                    <div class="legend-item"><div class="legend-color red"></div><span data-tooltip="${getTooltipText(sec, 'Malo').replace(/"/g, '&quot;')}">Malo</span></div>
+                    <div class="legend-item"><div class="legend-color gray"></div><span data-tooltip="${getTooltipText(sec, 'N/A').replace(/"/g, '&quot;')}">No Aplica</span></div>
                 </div>
                 <div class="${sec === 6 || sec === 5 || sec === 9 || sec === 10 ? 'checklist-full' : 'checklist'}">
                     ${generateChecklistItems(sec)}
@@ -355,12 +440,25 @@ function generateChecklistItems(sectionId) {
         const el = document.getElementById(q.id);
         if (!el) return;
         const val = el.value;
-        let statusClass = '', statusText = '';
-        if (val === 'Bueno' || val === 'Sí') { statusClass = 'status-good'; statusText = '✓'; }
-        else if (val === 'Regular') { statusClass = 'status-regular'; statusText = '~'; }
-        else if (val === 'Malo' || val === 'No') { statusClass = 'status-bad'; statusText = '✗'; }
-        else { statusClass = 'status-na'; statusText = 'N/A'; }
-        html += `<div class="check-item"><div class="status ${statusClass}">${statusText}</div><div>${q.text}</div></div>`;
+        let statusClass = '', statusText = '', tooltip = '';
+        if (val === 'Bueno' || val === 'Sí') { 
+            statusClass = 'status-good'; 
+            statusText = '✓'; 
+            tooltip = getTooltipText(sectionId, 'Bueno');
+        } else if (val === 'Regular') { 
+            statusClass = 'status-regular'; 
+            statusText = '~'; 
+            tooltip = getTooltipText(sectionId, 'Regular');
+        } else if (val === 'Malo' || val === 'No') { 
+            statusClass = 'status-bad'; 
+            statusText = '✗'; 
+            tooltip = getTooltipText(sectionId, 'Malo');
+        } else { 
+            statusClass = 'status-na'; 
+            statusText = 'N/A'; 
+            tooltip = getTooltipText(sectionId, 'N/A');
+        }
+        html += `<div class="check-item"><div class="status ${statusClass}" data-tooltip="${tooltip.replace(/"/g, '&quot;')}">${statusText}</div><div>${q.text}</div></div>`;
     });
     return html;
 }
@@ -418,8 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// FUNCIÓN CORREGIDA PARA iOS - Guardar PDF usando html2pdf.js (compatible con iPhone)
-function saveAsPDF() {
+// Función para guardar PDF
+async function saveAsPDF() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
@@ -429,51 +527,72 @@ function saveAsPDF() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
     btn.disabled = true;
     
-    // Ocultar botones temporalmente
     const actionButtons = document.querySelector('.action-buttons');
     if (actionButtons) actionButtons.style.display = 'none';
     
-    // Configuración OPTIMIZADA para iOS
-    const opt = {
-        margin: [0.3, 0.3, 0.3, 0.3],
-        filename: `Peritaje_${plate}_${date}.pdf`,
-        image: { type: 'jpeg', quality: 0.92 },
-        html2canvas: { 
-            scale: 1.8,
+    try {
+        await new Promise(r => setTimeout(r, 300));
+        
+        const cloneElement = element.cloneNode(true);
+        cloneElement.style.position = 'absolute';
+        cloneElement.style.top = '-9999px';
+        cloneElement.style.left = '-9999px';
+        cloneElement.style.width = '800px';
+        cloneElement.style.backgroundColor = '#ffffff';
+        document.body.appendChild(cloneElement);
+        
+        const cloneButtons = cloneElement.querySelectorAll('.action-buttons, .btn-action');
+        cloneButtons.forEach(btn => btn.style.display = 'none');
+        
+        const canvas = await html2canvas(cloneElement, {
+            scale: 2,
             useCORS: true,
-            letterRendering: true,
             backgroundColor: '#ffffff',
             logging: false,
-            allowTaint: false,
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight
-        },
-        jsPDF: { 
-            unit: 'in', 
-            format: 'letter',
-            orientation: 'portrait',
-            compress: true
-        }
-    };
-    
-    // Pequeño retraso para iOS
-    setTimeout(() => {
-        html2pdf().set(opt).from(element).save().then(() => {
-            if (actionButtons) actionButtons.style.display = 'flex';
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-        }).catch((error) => {
-            console.error('Error:', error);
-            if (actionButtons) actionButtons.style.display = 'flex';
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-            alert('Error al generar PDF. Por favor intente nuevamente.');
+            windowWidth: cloneElement.scrollWidth,
+            windowHeight: cloneElement.scrollHeight
         });
-    }, 200);
+        
+        document.body.removeChild(cloneElement);
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        
+        let position = 0;
+        let heightLeft = imgHeight;
+        
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+        
+        pdf.save(`Peritaje_${plate}_${date}.pdf`);
+        
+        if (actionButtons) actionButtons.style.display = 'flex';
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        
+    } catch (error) {
+        console.error('Error:', error);
+        if (actionButtons) actionButtons.style.display = 'flex';
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        alert('Error al generar PDF. Por favor intente nuevamente.');
+    }
 }
 
-// Función para guardar en el teléfono (también optimizada para iOS)
-function saveToDevice() {
+async function saveToDevice() {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
@@ -486,42 +605,67 @@ function saveToDevice() {
     const actionButtons = document.querySelector('.action-buttons');
     if (actionButtons) actionButtons.style.display = 'none';
     
-    const opt = {
-        margin: [0.3, 0.3, 0.3, 0.3],
-        filename: `Peritaje_${plate}_${date}.pdf`,
-        image: { type: 'jpeg', quality: 0.92 },
-        html2canvas: { 
-            scale: 1.8,
+    try {
+        await new Promise(r => setTimeout(r, 300));
+        
+        const cloneElement = element.cloneNode(true);
+        cloneElement.style.position = 'absolute';
+        cloneElement.style.top = '-9999px';
+        cloneElement.style.left = '-9999px';
+        cloneElement.style.width = '800px';
+        cloneElement.style.backgroundColor = '#ffffff';
+        document.body.appendChild(cloneElement);
+        
+        const cloneButtons = cloneElement.querySelectorAll('.action-buttons, .btn-action');
+        cloneButtons.forEach(btn => btn.style.display = 'none');
+        
+        const canvas = await html2canvas(cloneElement, {
+            scale: 2,
             useCORS: true,
-            letterRendering: true,
             backgroundColor: '#ffffff',
             logging: false,
-            allowTaint: false,
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight
-        },
-        jsPDF: { 
-            unit: 'in', 
-            format: 'letter',
-            orientation: 'portrait',
-            compress: true
-        }
-    };
-    
-    setTimeout(() => {
-        html2pdf().set(opt).from(element).save().then(() => {
-            if (actionButtons) actionButtons.style.display = 'flex';
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-            alert('✅ Informe guardado exitosamente en tu dispositivo.');
-        }).catch((error) => {
-            console.error('Error:', error);
-            if (actionButtons) actionButtons.style.display = 'flex';
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-            alert('❌ Error al guardar el informe. Por favor intente nuevamente.');
+            windowWidth: cloneElement.scrollWidth,
+            windowHeight: cloneElement.scrollHeight
         });
-    }, 200);
+        
+        document.body.removeChild(cloneElement);
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        
+        let position = 0;
+        let heightLeft = imgHeight;
+        
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+        
+        pdf.save(`Peritaje_${plate}_${date}.pdf`);
+        
+        if (actionButtons) actionButtons.style.display = 'flex';
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        alert('✅ Informe guardado exitosamente en tu dispositivo.');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        if (actionButtons) actionButtons.style.display = 'flex';
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        alert('❌ Error al guardar el informe.');
+    }
 }
 
 function printReport() { 
