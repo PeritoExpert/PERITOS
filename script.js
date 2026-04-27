@@ -1,231 +1,263 @@
+// script.js - SOLO MODIFICADA LA FUNCIÓN saveAsPDF()
+
 // Variables globales
 let currentSection = 1;
 const totalSections = 13;
-let radarChart = null;
 
-// PESOS DE SECCIONES
+// PESOS AJUSTADOS: Fugas (15%) y Motor (15%) tienen más peso
 const sectionWeights = {
-    1: 5, 2: 10, 3: 10, 4: 15, 5: 10, 6: 10, 7: 15, 8: 10, 9: 10, 10: 10, 11: 5, 12: 5
+    1: 5,   // Datos del vehículo
+    2: 10,  // Documentación
+    3: 10,  // Valores comerciales
+    4: 15,  // Fuga de fluidos - AUMENTADO
+    5: 10,  // Sistema eléctrico
+    6: 10,  // Inspección visual
+    7: 15,  // Estado del motor - AUMENTADO
+    8: 10,  // Llantas
+    9: 10,  // Tren delantero
+    10: 10, // Interior
+    11: 5,  // Accesorios
+    12: 5   // Prueba de ruta
 };
 
-const sectionNames = {
-    2: 'Documentación', 4: 'Fugas', 5: 'Sistema Eléctrico', 6: 'Carrocería',
-    7: 'Motor', 8: 'Llantas', 9: 'Suspensión', 10: 'Interior', 11: 'Accesorios', 12: 'Prueba Ruta'
+// Preguntas para cada sección
+const sectionQuestions = {
+    2: [
+        { id: "soat", text: "SOAT vigente" },
+        { id: "propertyCard", text: "Tarjeta de propiedad" },
+        { id: "accidentsReported", text: "Reporta siniestros" },
+        { id: "techReview", text: "Rev. Tecnomecánica" },
+        { id: "hasInsurance", text: "Aseguradora" }
+    ],
+    4: [
+        { id: "engineOilLeak", text: "Fuga de aceite motor" },
+        { id: "transmissionOilLeak", text: "Fuga de aceite caja" },
+        { id: "coolantLeak", text: "Fuga de refrigerante" },
+        { id: "brakeFluidLeak", text: "Fuga de líquido de freno" },
+        { id: "powerSteeringLeak", text: "Fuga de dirección hidráulica" },
+        { id: "differentialLeak", text: "Fuga de diferencial" }
+    ],
+    5: [
+        { id: "frontWindshield", text: "Panorámico delantero" },
+        { id: "rearWindshield", text: "Panorámico trasero" },
+        { id: "windows", text: "Vidrios" },
+        { id: "wipers", text: "Plumillas" },
+        { id: "rightHeadlight", text: "Farola derecha" },
+        { id: "leftHeadlight", text: "Farola izquierda" },
+        { id: "rightBrakeLight", text: "Stop derecho" },
+        { id: "leftBrakeLight", text: "Stop izquierdo" },
+        { id: "horn", text: "Bocina" },
+        { id: "battery", text: "Batería" },
+        { id: "fuses", text: "Fusibles" },
+        { id: "alternator", text: "Alternador" }
+    ],
+    6: [
+        { id: "leftFender", text: "Guardafango izquierdo trasero" },
+        { id: "rightFender", text: "Guardafango derecho trasero" },
+        { id: "rightSide", text: "Guardafango izquierdo delantero" },
+        { id: "leftSide", text: "Guardafango derecho delantero" },
+        { id: "leftRearDoor", text: "Puerta trasera izquierda" },
+        { id: "rightRearDoor", text: "Puerta trasera derecha" },
+        { id: "rightFrontDoor", text: "Puerta delantera derecha" },
+        { id: "leftFrontDoor", text: "Puerta delantera izquierda" },
+        { id: "rightRunningBoard", text: "Estribo derecho delantero" },
+        { id: "hood", text: "Capo" },
+        { id: "leftRunningBoard", text: "Estribo izquierdo delantero" },
+        { id: "rightRearRunningBoard", text: "Estribo derecho trasero" },
+        { id: "frontBumper", text: "Defensa delantera" },
+        { id: "rearBumper", text: "Defensa trasera" },
+        { id: "roof", text: "Techo" }
+    ],
+    7: [
+        { id: "cylinderCompression", text: "Compresión por cilindro" },
+        { id: "obdScan", text: "Escaneo OBD-II" }
+    ],
+    8: [
+        { id: "frontTires", text: "Llantas delanteras" },
+        { id: "rearTires", text: "Llantas traseras" },
+        { id: "spareTire", text: "Llanta de repuesto" },
+        { id: "tireWear", text: "Desgaste" },
+        { id: "rimsCondition", text: "Estado de rines" }
+    ],
+    9: [
+        { id: "brakePads", text: "Pastillas de freno" },
+        { id: "brakeDiscs", text: "Discos de freno" },
+        { id: "frontShocks", text: "Amortiguadores delanteros" },
+        { id: "rearShocks", text: "Amortiguadores traseros" },
+        { id: "axleTips", text: "Puntas de ejes" },
+        { id: "axles", text: "Axiales" },
+        { id: "terminals", text: "Terminales" },
+        { id: "ballJoints", text: "Rotulas" },
+        { id: "bushings", text: "Bujes" },
+        { id: "controlArms", text: "Tijeras" },
+        { id: "steeringBox", text: "Caja de dirección" },
+        { id: "bearings", text: "Rodamientos" },
+        { id: "chassis", text: "Chasís" }
+    ],
+    10: [
+        { id: "heating", text: "Calefacción" },
+        { id: "ac", text: "Aire acondicionado" },
+        { id: "radio", text: "Radio" },
+        { id: "alarm", text: "Alarma" },
+        { id: "upholstery", text: "Tapicería" },
+        { id: "dashboard", text: "Tablero" },
+        { id: "dashboardLights", text: "Luces tablero" },
+        { id: "interiorLights", text: "Luces interiores" },
+        { id: "seatBelts", text: "Cinturones de seguridad" },
+        { id: "mirrors", text: "Espejos" },
+        { id: "powerWindows", text: "Elevavidrios" },
+        { id: "locks", text: "Seguros" }
+    ],
+    11: [
+        { id: "speakers", text: "Parlantes" },
+        { id: "powerPlant", text: "Planta" },
+        { id: "steeringWheel", text: "Timón o volante" },
+        { id: "luxuryRims", text: "Rines de lujo" },
+        { id: "safetyFilm", text: "Película de seguridad" }
+    ],
+    12: [
+        { id: "acceleration", text: "Aceleración" },
+        { id: "handling", text: "Maniobrabilidad" },
+        { id: "alignment", text: "Angulo de alineación" },
+        { id: "braking", text: "Condición de frenado" },
+        { id: "clutch", text: "Condición de embrague" },
+        { id: "gearboxEngine", text: "Relación caja-motor" },
+        { id: "vibrations", text: "Vibraciones" }
+    ]
 };
 
-// ============================================================
-// TEXTOS PERSONALIZABLES PARA LOS TOOLTIPS DE CADA SECCIÓN
-// ============================================================
-
-const tooltipTexts = {
-    default: {
-        Bueno: "✅ Perfecto estado, sin novedad. La pieza funciona correctamente.",
-        Regular: "⚠️ Regular: Se observan rayones, pequeños golpes o desgaste leve. Requiere atención menor.",
-        Malo: "❌ Malo: Presencia de masilla, reparaciones previas o daños estructurales. Requiere reparación.",
-        "N/A": "⚪ No aplica: Esta característica no está presente en el vehículo."
-    },
-    
-    // SECCIÓN 2: DOCUMENTACIÓN
-    2: {
-        Bueno: "✅ Documentación en regla y vigente. Todo en orden.",
-        Regular: "⚠️ Documentación con observaciones pendientes. Revisar fechas.",
-        Malo: "❌ Documentación faltante o vencida. Requiere actualización urgente.",
-        "N/A": "⚪ No aplica para este vehículo."
-    },
-    
-    // SECCIÓN 4: FUGAS DE FLUIDOS
-    4: {
-        Bueno: "✅ SIN FUGAS: El sistema está completamente sellado y en perfecto estado. No se detectan pérdidas de fluidos.",
-        Regular: "⚠️ HUMEDAD: Se observan leves manchas de humedad o sudoración. Monitorear periódicamente. No representa fuga activa.",
-        Malo: "❌ FUGA ACTIVA: Se detecta pérdida visible de fluido. Requiere reparación inmediata.",
-        "N/A": "⚪ Componente no presente en el vehículo."
-    },
-    
-    // SECCIÓN 5: SISTEMA ELÉCTRICO
-    5: {
-        Bueno: "✅ SISTEMA ÓPTIMO: Todos los componentes eléctricos funcionan correctamente sin novedad.",
-        Regular: "⚠️ DESGASTE: Algunos componentes presentan desgaste leve o funcionan intermitentemente.",
-        Malo: "❌ FALLAS: Fallas eléctricas detectadas. Requiere diagnóstico y reparación urgente.",
-        "N/A": "⚪ Componente no presente en el vehículo."
-    },
-    
-    // SECCIÓN 6: CARROCERÍA
-    6: {
-        Bueno: "✅ PERFECTO: Carrocería en estado impecable. Sin abolladuras, rayones, golpes ni reparaciones.",
-        Regular: "⚠️ RAYONES O REPINTADO: Se observan rayones superficiales, pequeños golpes o evidencia de repintado menor. Sin daño estructural.",
-        Malo: "❌ GOLPES O MASILLA: Presencia de masilla, reparaciones estructurales previas, abolladuras profundas o daños importantes.",
-        "N/A": "⚪ Pieza no presente en el vehículo."
-    },
-    
-    // SECCIÓN 7: MOTOR
-    7: {
-        Bueno: "✅ MOTOR ÓPTIMO: Compresión y escaneo OBD-II en parámetros normales. Funcionamiento excelente.",
-        Regular: "⚠️ IRREGULARIDADES: Motor con pequeñas irregularidades. Requiere mantenimiento preventivo menor.",
-        Malo: "❌ FALLAS GRAVES: Motor con fallas importantes en compresión o códigos OBD-II críticos. Requiere reparación urgente.",
-        "N/A": "⚪ No aplica para este vehículo."
-    },
-    
-    // SECCIÓN 8: LLANTAS
-    8: {
-        Bueno: "✅ LLANTAS ÓPTIMAS: Labrado suficiente, presión adecuada y sin daños visibles.",
-        Regular: "⚠️ DESGASTE IRREGULAR: Llantas con desgaste desigual. Monitorear presión y alineación.",
-        Malo: "❌ LLANTAS DAÑADAS: Llantas muy desgastadas (menos de 1.6mm), con cortes, abultamientos o daños. Requieren reemplazo inmediato.",
-        "N/A": "⚪ No aplica para este vehículo."
-    },
-    
-    // SECCIÓN 9: SUSPENSIÓN
-    9: {
-        Bueno: "✅ SUSPENSIÓN PERFECTA: Sin holguras, ruidos anormales ni fugas. Amortiguación correcta.",
-        Regular: "⚠️ DESGASTE LEVE: Suspensión con leve desgaste. Requiere revisión periódica.",
-        Malo: "❌ SUSPENSIÓN DAÑADA: Fugas de aceite en amortiguadores, componentes sueltos, holguras excesivas o ruidos fuertes.",
-        "N/A": "⚪ Componente no presente en el vehículo."
-    },
-    
-    // SECCIÓN 10: INTERIOR
-    10: {
-        Bueno: "✅ INTERIOR EXCELENTE: Tapicería y componentes funcionales en perfecto estado.",
-        Regular: "⚠️ DESGASTE NORMAL: Interior con desgaste normal por uso. Algunos detalles estéticos menores.",
-        Malo: "❌ INTERIOR DAÑADO: Tapicería rota, desgarrada o componentes no funcionales. Requiere reparación.",
-        "N/A": "⚪ No aplica para este vehículo."
-    },
-    
-    // SECCIÓN 11: ACCESORIOS
-    11: {
-        Bueno: "✅ ACCESORIOS OK: Accesorios instalados y funcionando correctamente.",
-        Regular: "⚠️ ACCESORIOS REGULAR: Accesorios instalados pero con algún detalle estético o funcional menor.",
-        Malo: "❌ ACCESORIOS DAÑADOS: Accesorios dañados o no funcionales. Requieren reparación o reemplazo.",
-        "N/A": "⚪ No aplica para este vehículo."
-    },
-    
-    // SECCIÓN 12: PRUEBA DE RUTA
-    12: {
-        Bueno: "✅ PRUEBA EXITOSA: Comportamiento excelente en aceleración, frenado, dirección y estabilidad.",
-        Regular: "⚠️ IRREGULARIDADES: Pequeñas irregularidades en la prueba de ruta. Requiere revisión menor.",
-        Malo: "❌ FALLAS EN RUTA: Prueba de ruta con fallas importantes en frenado, dirección o suspensión. Requiere revisión mecánica urgente.",
-        "N/A": "⚪ No aplica para este vehículo."
-    }
-};
-
-// Función para obtener el texto del tooltip
-function getTooltipText(sectionId, status) {
-    if (tooltipTexts[sectionId] && tooltipTexts[sectionId][status]) {
-        return tooltipTexts[sectionId][status];
-    }
-    if (tooltipTexts.default && tooltipTexts.default[status]) {
-        return tooltipTexts.default[status];
-    }
-    return status === 'Bueno' ? '✅ Perfecto estado' : 
-           status === 'Regular' ? '⚠️ Estado regular' : 
-           status === 'Malo' ? '❌ Estado malo' : '⚪ No aplica';
+// Función para obtener la fecha y hora actual formateada
+function getCurrentDateTime() {
+    const now = new Date();
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    return now.toLocaleString('es-CO', options);
 }
 
-// Preguntas por sección
-const sectionQuestions = {
-    2: [{ id: "soat", text: "SOAT vigente" }, { id: "propertyCard", text: "Tarjeta de propiedad" }, { id: "accidentsReported", text: "Reporta siniestros" }, { id: "techReview", text: "Rev. Tecnomecánica" }, { id: "hasInsurance", text: "Aseguradora" }],
-    4: [{ id: "engineOilLeak", text: "Fuga de aceite motor" }, { id: "transmissionOilLeak", text: "Fuga de aceite caja" }, { id: "coolantLeak", text: "Fuga de refrigerante" }, { id: "brakeFluidLeak", text: "Fuga de líquido de freno" }, { id: "powerSteeringLeak", text: "Fuga de dirección hidráulica" }, { id: "differentialLeak", text: "Fuga de diferencial" }],
-    5: [{ id: "frontWindshield", text: "Panorámico delantero" }, { id: "rearWindshield", text: "Panorámico trasero" }, { id: "windows", text: "Vidrios" }, { id: "wipers", text: "Plumillas" }, { id: "rightHeadlight", text: "Farola derecha" }, { id: "leftHeadlight", text: "Farola izquierda" }, { id: "rightBrakeLight", text: "Stop derecho" }, { id: "leftBrakeLight", text: "Stop izquierdo" }, { id: "horn", text: "Bocina" }, { id: "battery", text: "Batería" }, { id: "fuses", text: "Fusibles" }, { id: "alternator", text: "Alternador" }],
-    6: [{ id: "leftFender", text: "Guardafango izquierdo trasero" }, { id: "rightFender", text: "Guardafango derecho trasero" }, { id: "rightSide", text: "Guardafango izquierdo delantero" }, { id: "leftSide", text: "Guardafango derecho delantero" }, { id: "leftRearDoor", text: "Puerta trasera izquierda" }, { id: "rightRearDoor", text: "Puerta trasera derecha" }, { id: "rightFrontDoor", text: "Puerta delantera derecha" }, { id: "leftFrontDoor", text: "Puerta delantera izquierda" }, { id: "rightRunningBoard", text: "Estribo derecho delantero" }, { id: "hood", text: "Capo" }, { id: "leftRunningBoard", text: "Estribo izquierdo delantero" }, { id: "rightRearRunningBoard", text: "Estribo derecho trasero" }, { id: "frontBumper", text: "Defensa delantera" }, { id: "rearBumper", text: "Defensa trasera" }, { id: "roof", text: "Techo" }],
-    7: [{ id: "cylinderCompression", text: "Compresión por cilindro" }, { id: "obdScan", text: "Escaneo OBD-II" }],
-    8: [{ id: "frontTires", text: "Llantas delanteras" }, { id: "rearTires", text: "Llantas traseras" }, { id: "spareTire", text: "Llanta de repuesto" }, { id: "tireWear", text: "Desgaste" }, { id: "rimsCondition", text: "Estado de rines" }],
-    9: [{ id: "brakePads", text: "Pastillas de freno" }, { id: "brakeDiscs", text: "Discos de freno" }, { id: "frontShocks", text: "Amortiguadores delanteros" }, { id: "rearShocks", text: "Amortiguadores traseros" }, { id: "axleTips", text: "Puntas de ejes" }, { id: "axles", text: "Axiales" }, { id: "terminals", text: "Terminales" }, { id: "ballJoints", text: "Rotulas" }, { id: "bushings", text: "Bujes" }, { id: "controlArms", text: "Tijeras" }, { id: "steeringBox", text: "Caja de dirección" }, { id: "bearings", text: "Rodamientos" }, { id: "chassis", text: "Chasís" }],
-    10: [{ id: "heating", text: "Calefacción" }, { id: "ac", text: "Aire acondicionado" }, { id: "radio", text: "Radio" }, { id: "alarm", text: "Alarma" }, { id: "upholstery", text: "Tapicería" }, { id: "dashboard", text: "Tablero" }, { id: "dashboardLights", text: "Luces tablero" }, { id: "interiorLights", text: "Luces interiores" }, { id: "seatBelts", text: "Cinturones de seguridad" }, { id: "mirrors", text: "Espejos" }, { id: "powerWindows", text: "Elevavidrios" }, { id: "locks", text: "Seguros" }],
-    11: [{ id: "speakers", text: "Parlantes" }, { id: "powerPlant", text: "Planta" }, { id: "steeringWheel", text: "Timón o volante" }, { id: "luxuryRims", text: "Rines de lujo" }, { id: "safetyFilm", text: "Película de seguridad" }],
-    12: [{ id: "acceleration", text: "Aceleración" }, { id: "handling", text: "Maniobrabilidad" }, { id: "alignment", text: "Angulo de alineación" }, { id: "braking", text: "Condición de frenado" }, { id: "clutch", text: "Condición de embrague" }, { id: "gearboxEngine", text: "Relación caja-motor" }, { id: "vibrations", text: "Vibraciones" }]
-};
-
+// Función para navegar entre secciones
 function nextSection(sectionNumber) {
     document.getElementById(`section-${currentSection}`).classList.remove('active');
     document.getElementById(`section-${sectionNumber}`).classList.add('active');
     currentSection = sectionNumber;
-    document.getElementById('progressBar').style.width = `${(sectionNumber / totalSections) * 100}%`;
+    
+    // Actualizar barra de progreso
+    const progress = (sectionNumber / totalSections) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
 }
 
+// Función para volver al formulario desde el informe
+function backToForm() {
+    if (confirm('¿Está seguro de que desea volver al formulario? Perderá el informe actual y podrá corregir los datos.')) {
+        document.getElementById('finalReport').style.display = 'none';
+        document.getElementById('evaluationForm').style.display = 'block';
+        document.getElementById('finalReport').innerHTML = '';
+        window.scrollTo(0, 0);
+    }
+}
+
+// Función para validar la sección actual
 function validateSection(section) {
     let isValid = true;
-    document.querySelectorAll(`#section-${section} .validation-error`).forEach(e => e.style.display = 'none');
+    
+    // Ocultar todos los errores primero
+    document.querySelectorAll(`#section-${section} .validation-error`).forEach(error => {
+        error.style.display = 'none';
+    });
+    
+    // Validar campos según la sección
     const sectionElement = document.getElementById(`section-${section}`);
     const requiredElements = sectionElement.querySelectorAll('select[required], input[required]');
     
     requiredElements.forEach(element => {
         if (!element.value.trim()) {
-            const errorElement = document.getElementById(`${element.id}Error`);
-            if (errorElement) errorElement.style.display = 'block';
+            const errorId = `${element.id}Error`;
+            const errorElement = document.getElementById(errorId);
+            if (errorElement) {
+                errorElement.style.display = 'block';
+            }
             isValid = false;
+            
+            // Resaltar campo inválido
             element.style.borderColor = 'var(--bad)';
         } else {
             element.style.borderColor = '#ddd';
         }
     });
     
+    // Validaciones específicas por sección
     if (section === 3) {
-        const vals = ['marketValue', 'fasecoldaValue', 'expertValue'].map(id => parseFloat(document.getElementById(id).value.replace(/[^0-9.]/g, '')));
-        if (vals.some(v => isNaN(v))) { alert('Los valores comerciales deben ser números válidos'); isValid = false; }
+        // Validar que los valores comerciales sean números válidos
+        const marketValue = document.getElementById('marketValue').value;
+        const fasecoldaValue = document.getElementById('fasecoldaValue').value;
+        const expertValue = document.getElementById('expertValue').value;
+        
+        if (isNaN(parseFloat(marketValue.replace(/[^0-9.]/g, ''))) || 
+            isNaN(parseFloat(fasecoldaValue.replace(/[^0-9.]/g, ''))) || 
+            isNaN(parseFloat(expertValue.replace(/[^0-9.]/g, '')))) {
+            alert('Los valores comerciales deben ser números válidos');
+            isValid = false;
+        }
     }
     
     if (section === 13) {
-        const hasPhotos = ['Front', 'Side', 'Rear', 'Engine'].some(id => document.getElementById(`photo${id}`).files.length > 0);
-        if (!hasPhotos) { alert('Por favor suba al menos una foto del vehículo'); isValid = false; }
+        // Validar al menos una foto
+        const photoFront = document.getElementById('photoFront').files.length;
+        const photoSide = document.getElementById('photoSide').files.length;
+        const photoRear = document.getElementById('photoRear').files.length;
+        const photoEngine = document.getElementById('photoEngine').files.length;
+        
+        if (photoFront === 0 && photoSide === 0 && photoRear === 0 && photoEngine === 0) {
+            alert('Por favor suba al menos una foto del vehículo');
+            isValid = false;
+        }
     }
     
     if (isValid) {
-        if (section < totalSections) nextSection(section + 1);
-        else generateReport();
+        if (section < totalSections) {
+            nextSection(section + 1);
+        } else {
+            generateReport();
+        }
     } else {
+        // Scroll al primer error
         const firstError = sectionElement.querySelector('.validation-error[style*="display: block"]');
-        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
-
-function sanitizeText(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-function formatCurrency(value) { if (!value || isNaN(value)) return '$0'; return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value); }
-
-function calculateScores() {
-    const scores = {};
-    for (const sectionId in sectionQuestions) {
-        let totalScore = 0, answered = 0;
-        sectionQuestions[sectionId].forEach(q => {
-            const val = document.getElementById(q.id)?.value;
-            if (val === 'Bueno' || val === 'Sí') { totalScore += 100; answered++; }
-            else if (val === 'Regular') { totalScore += 60; answered++; }
-            else if (val === 'Malo' || val === 'No') { totalScore += 0; answered++; }
-        });
-        scores[sectionId] = answered > 0 ? Math.round(totalScore / answered) : 0;
-    }
-    return scores;
-}
-
-function calculateGlobalScore(sectionScores) {
-    let totalWeighted = 0, totalWeight = 0, penalty = 0;
-    for (const s in sectionScores) {
-        if (sectionWeights[s]) {
-            let score = sectionScores[s];
-            if (s == 4 || s == 7) {
-                if (score < 50) { score = Math.max(0, score - 30); penalty += 15; }
-                else if (score < 70) { score = Math.max(0, score - 15); penalty += 10; }
-            }
-            totalWeighted += score * sectionWeights[s];
-            totalWeight += sectionWeights[s];
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-    return Math.max(0, Math.round(totalWeighted / totalWeight) - penalty);
 }
 
-function generateRecommendations(scores) {
-    const recs = [];
-    if (scores[4] < 70) recs.push("🔴 SISTEMA DE FLUIDOS: Se detectaron fugas o humedad que pueden comprometer la seguridad y el rendimiento del motor. Revisar sellos y empaques.");
-    if (scores[7] < 70) recs.push("🔧 DIAGNÓSTICO DE MOTOR: Realizar un diagnóstico profundo del motor. La compresión o el escaneo OBD-II muestran anomalías.");
-    if (scores[5] < 60) recs.push("💡 SISTEMA ELÉCTRICO: Inspeccionar el sistema eléctrico. Faros, luces o componentes presentan fallas.");
-    if (scores[9] < 60) recs.push("🛞 TREN DELANTERO Y SUSPENSIÓN: Revisar componentes de suspensión y dirección. Se encontraron partes en estado regular o malo.");
-    if (scores[6] < 70) recs.push("🚗 CARROCERÍA: Evaluar la carrocería. Se observaron rayones, abolladuras o posibles trabajos de masilla.");
-    if (scores[12] < 60) recs.push("🏁 PRUEBA DE RUTA: Realizar una prueba de ruta más exhaustiva. La maniobrabilidad o el frenado presentan deficiencias.");
-    if (recs.length === 0) recs.push("✅ El vehículo se encuentra en óptimas condiciones generales. Mantener el mantenimiento preventivo.");
-    return recs;
+// Función para sanitizar texto (prevenir XSS)
+function sanitizeText(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
+// Función para formatear moneda
+function formatCurrency(value) {
+    if (!value || isNaN(value)) return '$0';
+    return new Intl.NumberFormat('es-CO', { 
+        style: 'currency', 
+        currency: 'COP', 
+        minimumFractionDigits: 0 
+    }).format(value);
+}
+
+// Función para generar el informe final
 function generateReport() {
+    // Ocultar formulario y mostrar informe
     document.getElementById('evaluationForm').style.display = 'none';
     document.getElementById('finalReport').style.display = 'block';
     
+    // Obtener valores del formulario (sanitizados)
     const vehicleData = {
         class: sanitizeText(document.getElementById('vehicleClass').value),
         brand: sanitizeText(document.getElementById('vehicleBrand').value),
@@ -246,443 +278,942 @@ function generateReport() {
         plate: sanitizeText(document.getElementById('vehiclePlate').value)
     };
     
+    // Calcular puntajes
     const sectionScores = calculateScores();
-    let globalScore = calculateGlobalScore(sectionScores);
-    let isApproved = globalScore >= 75;
-    const recommendations = generateRecommendations(sectionScores);
+    const globalScore = calculateGlobalScore(sectionScores);
+    const peritajeDateTime = getCurrentDateTime();
+    const reportNumber = Math.floor(Math.random() * 10000);
     
+    // Generar HTML del informe
     const reportHTML = `
         <div class="header">
             <div class="header-content">
                 <div class="logo-container">
-                    <div class="logo-img">
-                        <img src="peritologo.png" alt="PeritoExpert">
+                    <div class="logo-img">LOGO</div>
+                    <div class="logo-text">
+                        PeritoExpert
+                        <span>INFORME DE EVALUACIÓN</span>
                     </div>
                 </div>
-                <h1 class="report-title">Informe de Inspección Técnica</h1>
-                <div class="report-number">Peritaje #${Math.floor(Math.random() * 10000)}</div>
+                <div>
+                    <h1 class="report-title">Informe de Inspección Técnica</h1>
+                </div>
+                <div class="report-number">Peritaje #${reportNumber}</div>
             </div>
         </div>
         
-        <div class="executive-summary">
-            <div class="summary-veredict">
-                <div id="veredictStamp" class="veredict-stamp ${isApproved ? 'approved' : 'rejected'}">${isApproved ? '✅ APROBADO' : '❌ NO APROBADO'}</div>
-                <div style="margin-top: 8px; font-size: 11px;">Según criterios de evaluación</div>
-            </div>
-            <div id="trafficLight" class="traffic-light ${globalScore >= 75 ? 'green' : (globalScore >= 50 ? 'yellow' : 'red')}">${globalScore}%</div>
-            <div class="summary-score">
-                <div class="editable-score">
-                    <input type="number" id="globalScoreInput" value="${globalScore}" min="0" max="100" step="1">
-                    <span>%</span>
-                </div>
-                <div class="summary-label">Puntaje Global (Editable)</div>
-            </div>
+        <div class="peritaje-datetime">
+            <i class="fas fa-calendar-alt"></i> Fecha y hora del peritaje: ${peritajeDateTime}
         </div>
         
         <div class="vehicle-display">
             <div class="vehicle-photos">
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoFront" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Frontal</div></div>
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoSide" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Lateral</div></div>
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoRear" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Trasera</div></div>
-                <div class="photo-container"><div class="photo-placeholder"><img src="#" id="reportPhotoEngine" style="width:100%; height:100%; object-fit:cover;"></div><div class="photo-label">Motor</div></div>
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="#" id="reportPhotoFront" alt="Foto frontal del vehículo">
+                    </div>
+                    <div class="photo-label">Foto frontal del vehículo</div>
+                </div>
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="#" id="reportPhotoSide" alt="Foto lateral del vehículo">
+                    </div>
+                    <div class="photo-label">Foto lateral del vehículo</div>
+                </div>
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="#" id="reportPhotoRear" alt="Foto trasera del vehículo">
+                    </div>
+                    <div class="photo-label">Foto trasera del vehículo</div>
+                </div>
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="#" id="reportPhotoEngine" alt="Foto del motor">
+                    </div>
+                    <div class="photo-label">Motor</div>
+                </div>
             </div>
             <div class="vehicle-info">
                 <h2>Datos del Vehículo</h2>
                 <div class="info-grid">
-                    <div class="info-item"><div class="info-label">Clase</div><div class="info-value">${vehicleData.class}</div></div>
-                    <div class="info-item"><div class="info-label">Marca</div><div class="info-value">${vehicleData.brand}</div></div>
-                    <div class="info-item"><div class="info-label">Línea</div><div class="info-value">${vehicleData.line}</div></div>
-                    <div class="info-item"><div class="info-label">Carrocería</div><div class="info-value">${vehicleData.body}</div></div>
-                    <div class="info-item"><div class="info-label">Modelo</div><div class="info-value">${vehicleData.model}</div></div>
-                    <div class="info-item"><div class="info-label">Nacionalidad</div><div class="info-value">${vehicleData.nationality}</div></div>
-                    <div class="info-item"><div class="info-label">Caja</div><div class="info-value">${vehicleData.transmission}</div></div>
-                    <div class="info-item"><div class="info-label">Cilindraje</div><div class="info-value">${vehicleData.engine}</div></div>
-                    <div class="info-item"><div class="info-label">Combustible</div><div class="info-value">${vehicleData.fuel}</div></div>
-                    <div class="info-item"><div class="info-label">Pintura</div><div class="info-value">${vehicleData.paint}</div></div>
-                    <div class="info-item"><div class="info-label">Servicio</div><div class="info-value">${vehicleData.service}</div></div>
-                    <div class="info-item"><div class="info-label">Kilometraje</div><div class="info-value">${vehicleData.mileage}</div></div>
-                    <div class="info-item"><div class="info-label">Color</div><div class="info-value">${vehicleData.color}</div></div>
-                    <div class="info-item"><div class="info-label">Chasis</div><div class="info-value">${vehicleData.chassis}</div></div>
-                    <div class="info-item"><div class="info-label">Serial</div><div class="info-value">${vehicleData.serial}</div></div>
-                    <div class="info-item"><div class="info-label">Motor</div><div class="info-value">${vehicleData.motor}</div></div>
-                    <div class="info-item"><div class="info-label">Placa</div><div class="info-value">${vehicleData.plate}</div></div>
+                    <div class="info-item">
+                        <div class="info-label">Clase</div>
+                        <div class="info-value">${vehicleData.class}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Marca</div>
+                        <div class="info-value">${vehicleData.brand}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Línea</div>
+                        <div class="info-value">${vehicleData.line}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Carrocería</div>
+                        <div class="info-value">${vehicleData.body}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Modelo</div>
+                        <div class="info-value">${vehicleData.model}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Nacionalidad</div>
+                        <div class="info-value">${vehicleData.nationality}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Tipo de caja</div>
+                        <div class="info-value">${vehicleData.transmission}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Cilindraje</div>
+                        <div class="info-value">${vehicleData.engine}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Combustible</div>
+                        <div class="info-value">${vehicleData.fuel}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Pintura</div>
+                        <div class="info-value">${vehicleData.paint}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Servicio</div>
+                        <div class="info-value">${vehicleData.service}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Kilometraje</div>
+                        <div class="info-value">${vehicleData.mileage}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Color</div>
+                        <div class="info-value">${vehicleData.color}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">No. chasis</div>
+                        <div class="info-value">${vehicleData.chassis}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">No. serial</div>
+                        <div class="info-value">${vehicleData.serial}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">No. Motor</div>
+                        <div class="info-value">${vehicleData.motor}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Placa</div>
+                        <div class="info-value">${vehicleData.plate}</div>
+                    </div>
                 </div>
             </div>
         </div>
         
+        <!-- Sección de Valores Comerciales -->
         <div class="section commercial-values">
             <h2 class="section-title">Valores Comerciales</h2>
             ${generateCommercialValuesHTML()}
         </div>
         
         <div class="section">
-            <h2 class="section-title">Evaluación Detallada</h2>
-            ${generateDetailedSectionsHTML(sectionScores)}
-        </div>
-        
-        <div class="recommendations">
-            <h3><i class="fas fa-tools"></i> Recomendaciones</h3>
-            <ul>${recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
+            <h2 class="section-title">Evaluación por Secciones</h2>
+            
+            <!-- Sección Documentación -->
+            <div class="subsection">
+                <h3>Documentación</h3>
+                <div class="checklist">
+                    ${generateChecklistItems(2)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Documentación</div>
+                    <div class="score-value">${sectionScores[2]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[2]}%;" data-value="${sectionScores[2]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Fuga de fluidos (CRÍTICA) -->
+            <div class="subsection">
+                <h3>Fuga de fluidos <span style="color: var(--bad); font-size: 14px;">(Sección Crítica)</span></h3>
+                <div class="checklist">
+                    ${generateChecklistItems(4)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Fuga de fluidos</div>
+                    <div class="score-value">${sectionScores[4]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[4]}%;" data-value="${sectionScores[4]}"></div>
+                    </div>
+                    <div class="score-label" style="color: ${sectionScores[4] < 70 ? 'var(--bad)' : 'inherit'}">
+                        ${sectionScores[4] < 70 ? '⚠️ Sección crítica con baja puntuación' : 'Sección crítica en buen estado'}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Sistema Eléctrico -->
+            <div class="subsection">
+                <h3>Sistema Eléctrico</h3>
+                <div class="checklist-full">
+                    ${generateChecklistItems(5)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Sistema Eléctrico</div>
+                    <div class="score-value">${sectionScores[5]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[5]}%;" data-value="${sectionScores[5]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Inspección Visual -->
+            <div class="subsection">
+                <h3>Inspección Visual y Técnica</h3>
+                <div class="checklist-full">
+                    ${generateChecklistItems(6)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Inspección Visual</div>
+                    <div class="score-value">${sectionScores[6]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[6]}%;" data-value="${sectionScores[6]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Estado del Motor (CRÍTICA) -->
+            <div class="subsection">
+                <h3>Estado del Motor <span style="color: var(--bad); font-size: 14px;">(Sección Crítica)</span></h3>
+                <div class="checklist">
+                    ${generateChecklistItems(7)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Estado del Motor</div>
+                    <div class="score-value">${sectionScores[7]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[7]}%;" data-value="${sectionScores[7]}"></div>
+                    </div>
+                    <div class="score-label" style="color: ${sectionScores[7] < 70 ? 'var(--bad)' : 'inherit'}">
+                        ${sectionScores[7] < 70 ? '⚠️ Sección crítica con baja puntuación' : 'Sección crítica en buen estado'}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Llantas -->
+            <div class="subsection">
+                <h3>Llantas</h3>
+                <div class="checklist">
+                    ${generateChecklistItems(8)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Llantas</div>
+                    <div class="score-value">${sectionScores[8]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[8]}%;" data-value="${sectionScores[8]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Tren Delantero -->
+            <div class="subsection">
+                <h3>Tren Delantero y Suspensión</h3>
+                <div class="checklist-full">
+                    ${generateChecklistItems(9)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Tren Delantero</div>
+                    <div class="score-value">${sectionScores[9]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[9]}%;" data-value="${sectionScores[9]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Interior -->
+            <div class="subsection">
+                <h3>Interior del Vehículo</h3>
+                <div class="checklist-full">
+                    ${generateChecklistItems(10)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Interior</div>
+                    <div class="score-value">${sectionScores[10]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[10]}%;" data-value="${sectionScores[10]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Accesorios -->
+            <div class="subsection">
+                <h3>Accesorios</h3>
+                <div class="checklist">
+                    ${generateChecklistItems(11)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Accesorios</div>
+                    <div class="score-value">${sectionScores[11]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[11]}%;" data-value="${sectionScores[11]}"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección Prueba de Ruta -->
+            <div class="subsection">
+                <h3>Prueba de Ruta</h3>
+                <div class="checklist">
+                    ${generateChecklistItems(12)}
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Puntuación Prueba de Ruta</div>
+                    <div class="score-value">${sectionScores[12]}%</div>
+                    <div class="gauge">
+                        <div class="gauge-value" style="left: ${sectionScores[12]}%;" data-value="${sectionScores[12]}"></div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
         
         <div class="observations">
             <h3 class="observations-title">Observaciones del Perito</h3>
-            <p>${sanitizeText(document.getElementById('observations').value) || 'Sin observaciones adicionales.'}</p>
+            <p>${sanitizeText(document.getElementById('observations').value)}</p>
         </div>
         
         <div class="approval-criteria">
             <h3 class="criteria-title">Criterio de Aprobación</h3>
             <div class="criteria-grid">
-                <div class="criteria-item approved"><div class="criteria-icon">✓</div><div class="criteria-text"><strong>Aprobado</strong><br>Puntuación ≥ 75%</div></div>
-                <div class="criteria-item rejected"><div class="criteria-icon">✗</div><div class="criteria-text"><strong>No Aprobado</strong><br>Puntuación &lt; 75%</div></div>
+                <div class="criteria-item approved">
+                    <div class="criteria-icon">✓</div>
+                    <div class="criteria-text">
+                        <strong>Aprobado</strong><br>
+                        Puntuación igual o superior al 75%
+                    </div>
+                </div>
+                <div class="criteria-item rejected">
+                    <div class="criteria-icon">✗</div>
+                    <div class="criteria-text">
+                        <strong>No Aprobado</strong><br>
+                        Puntuación inferior al 75%
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="score-card">
+            <div class="score-label">Puntuación Global</div>
+            <div class="score-value">${globalScore}%</div>
+            <div class="gauge">
+                <div class="gauge-value" style="left: ${globalScore}%;" data-value="${globalScore}"></div>
+            </div>
+            <div class="score-label">
+                ${globalScore >= 75 ? 
+                    'Vehículo APROBADO según criterios de evaluación' : 
+                    'Vehículo NO APROBADO según criterios de evaluación'}
             </div>
         </div>
         
         <div class="signature-area">
-            <div class="signature-box"><div>Firma del Perito</div><div class="signature-line"></div><div>Nombre: ____________________</div><div>Registro: ___________________</div></div>
-            <div id="finalStamp" class="${isApproved ? 'approved-stamp' : 'not-approved-stamp'}">${isApproved ? 'APROBADO' : 'NO APROBADO'}</div>
-            <div class="signature-box"><div>Firma del Cliente</div><div class="signature-line"></div><div>Nombre: ____________________</div><div>CC/NIT: ____________________</div></div>
+            <div class="signature-box">
+                <div>Firma del Perito</div>
+                <div class="signature-line"></div>
+                <div>Nombre: ____________________</div>
+                <div>Registro: ___________________</div>
+            </div>
+            
+            <div class="${globalScore >= 75 ? 'approved-stamp' : 'not-approved-stamp'}">
+                ${globalScore >= 75 ? 'APROBADO' : 'NO APROBADO'}
+            </div>
+            
+            <div class="signature-box">
+                <div>Firma del Cliente</div>
+                <div class="signature-line"></div>
+                <div>Nombre: ____________________</div>
+                <div>CC/NIT: ____________________</div>
+            </div>
         </div>
         
         <div class="footer">
             <div class="footer-info">
-                <div>PERITOEXPERT</div>
-                <div>Teléfono: 315 715 2606</div>
+                <div>PERITOEXPERT.COM.CO</div>
+                <div>Teléfono: 3007152606</div>
                 <div>Email: peritoexpert.bogota@gmail.com</div>
                 <div>WEB: www.peritoexpert.com.co</div>
             </div>
-            <div>Este informe es confidencial y propiedad de PERITOEXPERT. La evaluación se basa en una inspección visual y pruebas funcionales al momento de la revisión.</div>
+            <div>Este informe es confidencial y propiedad de PERITOEXPERT. Su distribución está sujeta a autorización. Este documento tiene vigencia hasta cumplir 15 días después</div>
+            <div> de la inspección visual realizada. La evaluación se basa en una inspección visual y pruebas funcionales al momento de la revisión. PERITOEXPERT no se hace responsable</div>
+            <div>por fallas mecánicas que se presenten posterior a la inspección.</div>
         </div>
         
-        <!-- TÉRMINOS Y CONDICIONES -->
         <div class="legal-clauses">
-            <div style="margin-bottom: 8px; padding: 6px; border: 1px solid #d1ecf1; background-color: #f8f9fa;">
-                <h6 style="font-size: 8px; color: #e10600; margin-bottom: 4px; font-weight: bold; text-align: center;">DECLARACIONES, AUTORIZACIONES Y CONDICIONES DEL SERVICIO</h6>
-                <p style="font-size: 7px; text-align: center; font-weight: bold;">PERITOEXPERT</p>
-                <div style="margin-bottom: 4px;"><p style="margin: 2px 0; font-weight: bold;">Declaración de veracidad</p><p style="margin: 2px 0; text-align: justify;">Declaro bajo gravedad de juramento que toda la información es veraz y corresponde a la realidad.</p></div>
-                <div style="margin-bottom: 4px;"><p style="margin: 2px 0; font-weight: bold;">Autorización RUNT</p><p style="margin: 2px 0; text-align: justify;">Autorizo a PERITOEXPERT para consultar información en el RUNT y otras entidades.</p></div>
-                <div style="margin-bottom: 4px;"><p style="margin: 2px 0; font-weight: bold;">Exoneración por daños</p><p style="margin: 2px 0; text-align: justify;">PERITOEXPERT no se hace responsable por daños preexistentes o por desgaste natural del vehículo.</p></div>
+            <!-- DECLARACIONES, AUTORIZACIONES Y CONDICIONES -->
+            <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #d1ecf1; background-color: #f8f9fa;">
+                <h6 style="font-size: 8.5px; color: var(--f1-red); margin-bottom: 5px; font-weight: bold; text-align: center; text-transform: uppercase;">
+                    DECLARACIONES, AUTORIZACIONES Y CONDICIONES DEL SERVICIO
+                </h6>
+                <p style="font-size: 8.5px; color: #333; margin-bottom: 5px; text-align: center; font-weight: bold;">
+                    PERITOEXPERT S.A.S.
+                </p>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Declaración de veracidad y procedencia del vehículo</p>
+                    <p style="margin: 2px 0; text-align: justify;">Declaro bajo gravedad de juramento que toda la información y documentación suministrada a PERITOEXPERT S.A.S. es veraz, completa y corresponde a la realidad. Así mismo, manifiesto que el vehículo presentado para la inspección es de procedencia lícita. En consecuencia, asumo de manera exclusiva cualquier responsabilidad de tipo penal, civil, administrativa o fiscal que se derive de esta orden de trabajo, eximiendo a PERITOEXPERT de cualquier responsabilidad por información falsa, incompleta u omitida.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Autorización para consulta de información</p>
+                    <p style="margin: 2px 0; text-align: justify;">Autorizo expresa e irrevocablemente a PERITOEXPERT para consultar mi información personal y la del vehículo en el Registro Único Nacional de Tránsito (RUNT), así como en otras entidades públicas o privadas afiliadas o relacionadas, con el fin de solicitar, consultar y validar la información del vehículo identificado con la placa consignada en el informe de inspección.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Prestación del servicio</p>
+                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT. presta al cliente el servicio de peritaje automotriz, el cual puede incluir inspección técnica, validación de asegurabilidad y avalúo comercial referencial, de acuerdo con el alcance contratado y las condiciones establecidas en el presente informe.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Inspección de asegurabilidad</p>
+                    <p style="margin: 2px 0; text-align: justify;">La empresa se compromete a realizar la inspección de asegurabilidad del vehículo conforme a los criterios técnicos, protocolos internos y convenios vigentes con las compañías aseguradoras, cuando aplique, aclarando que el dictamen emitido corresponde exclusivamente al estado observable del vehículo al momento de la inspección.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Avalúo comercial</p>
+                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT S.A.S. se compromete a realizar el avalúo comercial del vehículo conforme a metodologías, referencias del mercado y procedimientos internos establecidos. El resultado del avalúo no compromete a la empresa con la comercialización del automotor, ni constituye una obligación de compra, venta o intermediación.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Notificaciones y reportes</p>
+                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT bajo ninguna circunstancia realizará notificaciones, reportes, alertas o registros ante autoridades, aseguradoras o terceros respecto al vehículo durante la ejecución del peritaje, salvo que exista una obligación legal expresa que así lo exija.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Derecho de suspensión o retiro del vehículo</p>
+                    <p style="margin: 2px 0; text-align: justify;">La empresa se reserva el derecho de suspender la inspección o retirar el vehículo del proceso cuando este represente un riesgo para la seguridad del personal, presente fallas mecánicas graves, condiciones estructurales peligrosas o cualquier situación que pueda comprometer la integridad del vehículo o de los inspectores.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">No realización de reparaciones</p>
+                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT no realiza ningún tipo de reparación, ajuste, mantenimiento ni modificación al vehículo inspeccionado. Todas las pruebas y verificaciones realizadas son únicamente de carácter diagnóstico y observacional.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Resultados del informe</p>
+                    <p style="margin: 2px 0; text-align: justify;">La empresa no emite conceptos, resultados ni conclusiones distintas a las derivadas directamente de la inspección realizada. PERITOEXPERT S.A.S. no recomienda talleres, empresas ni terceros para la reparación o intervención del vehículo.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Interpretación del informe</p>
+                    <p style="margin: 2px 0; text-align: justify;">Los arreglos, reparaciones o decisiones que se deriven del informe de inspección no comprometen a PERITOEXPERT, teniendo en cuenta que el informe puede estar sujeto a diversas interpretaciones técnicas por parte de terceros.</p>
+                </div>
+                
+                <div style="margin-bottom: 6px;">
+                    <p style="margin: 2px 0; font-weight: bold;">Exoneración por daños durante la inspección</p>
+                    <p style="margin: 2px 0; text-align: justify;">PERITOEXPERT S.A.S. no se hace responsable por daños que se presenten durante la inspección cuando estos se deban a condiciones preexistentes del vehículo, desgaste natural o falta de mantenimiento, incluyendo, pero sin limitarse a: bomba de gasolina eléctrica (por bajo nivel de combustible), correa de repartición (por incumplimiento de mantenimientos recomendados por el fabricante), bobinas electrónicas, guayas de acelerador, embrague, frenos, capó, elementos eléctricos, bombillos de farolas, luces de freno, luces exploradoras, motor, caja o transmisión, así como cualquier otro componente que falle por uso previo o deterioro anterior al ingreso del vehículo al peritaje.</p>
+                </div>
+            </div>
+            
+            <!-- SISTEMAS TÉCNICOS -->
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">SUSPENSIÓN</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> PERITOEXPERT realiza una inspección visual de los componentes visibles del sistema de suspensión, tales como: tijeras, barra estabilizadora, espirales, tensores, bujes, muñecos, soportes, brazos axiales, terminales, rótulas y muelles. Adicionalmente, se efectúa una verificación básica del rebote del vehículo mediante la aplicación de fuerza manual.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> La validación visual y la prueba de rebote se realizan sin desmontar ningún componente del vehículo, y se limitan únicamente a los elementos accesibles durante la inspección.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> La evaluación del estado funcional interno de espirales de suspensión, ballestas, barras de torsión, amortiguadores presurizados, sistemas hidráulicos o neumáticos de suspensión, sensores, actuadores o controladores electrónicos asociados al sistema. Tampoco se determina la vida útil restante de los elementos de suspensión, tales como tijeras, espirales, tensores, barra estabilizadora, bujes o componentes similares.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">FRENOS</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> El peritaje incluye un diagnóstico visual y una verificación física básica del funcionamiento del pedal de freno y del freno de estacionamiento. Se revisa visualmente el estado de los discos de freno, el nivel del líquido de frenos y la posible presencia de fugas en las líneas hidráulicas visibles.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> La verificación del estado de los discos se limita a una inspección visual, por lo cual el resultado no garantiza el desempeño funcional del sistema de frenos en condiciones reales de uso.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> La determinación del nivel de desgaste o vida útil de pastillas, bandas, zapatas o elementos de fricción. No se evalúa el estado funcional ni la durabilidad de guayas, bomba de freno, freno de mano ni sistemas de asistencia. No se valida el funcionamiento de sensores, módulos electrónicos EBD, ABS u otros sistemas de control de frenado. No se analiza la calidad del líquido de frenos ni se realizan pruebas de ruta.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">DIRECCIÓN</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> PERITOEXPERT verifica visualmente la existencia de fugas de aceite en la caja de dirección y en el depósito del sistema hidráulico. Se inspecciona el estado visible de guardapolvos, brazos de dirección y axiales, así como la presencia de pines de seguridad en terminales y rótulas, cuando aplique.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> Esta revisión es de carácter visual y no implica el uso de equipos profesionales de diagnóstico para validar el desempeño interno del sistema.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se realizan mediciones de alineación como camber, caster, convergencia o divergencia. No se evalúa la suavidad, precisión o confort del timón. No se valida el estado funcional interno de la caja de dirección, holguras internas, desgaste de componentes ni su vida útil.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">LLANTAS</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Se inspecciona el estado del labrado y de la banda radial de las llantas en uso, verificando que cumplan con las profundidades mínimas exigidas por la normativa técnica vigente.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> La estimación de vida útil de las llantas se realiza con base en la profundidad del labrado, la cual puede variar considerablemente dependiendo del tipo de conducción y uso posterior del vehículo.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se revisan componentes internos de las llantas ni se detectan deformaciones internas o externas no visibles a simple vista.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">RINES</h6>
+                <p style="margin: 2px 0;">PERITOEXPERT no valida si los rines presentan procesos previos de rectificación, reconstrucción, deformación estructural, fisuras o desbalanceo.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">SISTEMA ELÉCTRICO</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Se verifica el funcionamiento observable de los sistemas eléctricos y electrónicos del vehículo, incluyendo: techo corredizo (si aplica), retrovisores eléctricos, limpiabrisas delantero y trasero, nivel de líquido limpiaparabrisas, luces (altas, bajas, direccionales, estacionarias, freno, reversa, placa, antiniebla, luz interior y exploradoras), aire acondicionado, calefacción, desempañador, tablero de instrumentos (radio, velocímetro, tacómetro, reloj, pito y testigos) y sistema de bloqueo central.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> La revisión se realiza de forma visual y funcional básica. El correcto funcionamiento depende del estado de carga de la batería al momento del peritaje.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se determina la vida útil de componentes eléctricos ni la potencia real de iluminación. No se inspeccionan conexiones eléctricas internas. No se valida el funcionamiento de alarmas originales o genéricas, funciones automáticas de elevalunas, retracción de espejos ni sensores o módulos electrónicos de seguridad o confort.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">TRANSMISIÓN DE POTENCIA</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Inspección visual del estado de ejes cardánicos y crucetas, verificación de fugas de fluidos en diferencial, caja de transmisión y bomba de embrague. Se revisa el nivel del líquido de embrague cuando aplique y el estado visible de guardapolvos de semiejes.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> La inspección se realiza con el vehículo en condición estacionaria, sin encendido prolongado ni uso de equipos especializados.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se valida el funcionamiento interno de la caja de velocidades ni del diferencial. No se evalúa desgaste interno del embrague, selectores de cambio, transmisiones automáticas, manuales, CVT o secuenciales. No se inspeccionan juntas homocinéticas, rodamientos, ruidos internos, ni sistemas de tracción integral.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">CHASIS</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Revisión visual de puntas de chasis delanteras y traseras, piso de carrocería, baúl, panel trasero, parales, traviesas, largueros, capota, soldaduras y sellantes estructurales, así como la originalidad del sistema de identificación.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> Un buen estado visual no garantiza que el vehículo conserve las medidas de alineación originales, ya que pueden existir deformaciones no perceptibles.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se realiza medición de cotas estructurales, distancia entre ejes ni inspección de áreas no visibles sin desmontaje.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">PINTURA</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Validación visual del estado de la pintura y medición del espesor de micras para identificar posibles intervenciones.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se determina si la pintura es de fábrica ni se realizan pruebas de tono, imprimación o adherencia.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">ACCESORIOS</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Inventario visual de accesorios adicionales al equipamiento original y estimación referencial de su valor.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> Los accesorios solo se consideran como valor adicional y no garantizan funcionamiento correcto.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se valida el estado funcional ni comercial real de los accesorios.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">MOTOR</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Revisión visual de fugas de fluidos, sistema de escape en baja, radiador, niveles de aceite y refrigerante, estado de correas y originalidad de identificación.</p>
+                <p style="margin: 2px 0;"><strong>Observaciones:</strong> No se realiza diagnóstico con el motor en funcionamiento ni análisis interno del motor.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se evalúa desgaste interno, emisiones contaminantes, ruidos normales ni calidad de fluidos.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">CARROCERÍA</h6>
+                <p style="margin: 2px 0;"><strong>Alcance del servicio:</strong> Inspección visual de tapicería, componentes de confort, amortiguadores de baúl y capó, lámina, pintura y ajustes de piezas externas.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> No se valida estanqueidad, ruidos, ni estructuras internas no visibles.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">VALORES COMERCIALES - PERITOEXPERT</h6>
+                <p style="margin: 2px 0;">Los valores entregados son referenciales, basados en fuentes del mercado colombiano y no constituyen un valor definitivo de compra, venta o aseguramiento.</p>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+                <h6 style="font-size: 8.5px; color: #333; margin-bottom: 3px; font-weight: bold;">TESTIGOS DE ALERTA (TABLERO)</h6>
+                <p style="margin: 2px 0;">Se verifica el encendido y apagado correcto de los testigos al iniciar el vehículo.</p>
+                <p style="margin: 2px 0;"><strong>Este servicio NO comprende:</strong> Diagnóstico de fallas electrónicas ni lectura de códigos mediante escáner.</p>
             </div>
         </div>
         
-        <div class="action-buttons">
-            <button onclick="printReport()" class="btn-action"><i class="fas fa-print"></i> Imprimir</button>
-            <button onclick="saveAsPDF()" class="btn-action btn-pdf"><i class="fas fa-file-pdf"></i> Guardar PDF</button>
-            <button onclick="saveToDevice()" class="btn-action btn-save"><i class="fas fa-download"></i> Guardar en el teléfono</button>
-            <button onclick="newEvaluation()" class="btn-action btn-secondary"><i class="fas fa-plus"></i> Nueva Evaluación</button>
+        <div class="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 30px 0;">
+            <button onclick="backToForm()" class="btn-action btn-back">
+                <i class="fas fa-arrow-left"></i> Corregir Formulario
+            </button>
+            <button onclick="printReport()" class="btn-action">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+            <button onclick="saveAsPDF(event)" class="btn-action btn-pdf">
+                <i class="fas fa-file-pdf"></i> Guardar como PDF
+            </button>
+            <button onclick="newEvaluation()" class="btn-action btn-secondary">
+                <i class="fas fa-plus"></i> Nueva Evaluación
+            </button>
         </div>
     `;
     
+    // Insertar HTML en el contenedor del informe
     document.getElementById('finalReport').innerHTML = reportHTML;
+    
+    // Cargar imágenes si están disponibles
     loadReportImages();
+    
+    // Animar gráficas de valores comerciales
     animateCommercialValues();
     
-    const scoreInput = document.getElementById('globalScoreInput');
-    if (scoreInput) {
-        scoreInput.addEventListener('input', function() {
-            let newScore = parseInt(this.value);
-            if (isNaN(newScore)) newScore = 0;
-            newScore = Math.min(100, Math.max(0, newScore));
-            this.value = newScore;
-            const isApprovedNow = newScore >= 75;
-            const veredictDiv = document.getElementById('veredictStamp');
-            const trafficLight = document.getElementById('trafficLight');
-            const stamp = document.getElementById('finalStamp');
-            if (veredictDiv) {
-                veredictDiv.textContent = isApprovedNow ? '✅ APROBADO' : '❌ NO APROBADO';
-                veredictDiv.className = `veredict-stamp ${isApprovedNow ? 'approved' : 'rejected'}`;
-            }
-            if (trafficLight) {
-                trafficLight.textContent = `${newScore}%`;
-                trafficLight.className = `traffic-light ${newScore >= 75 ? 'green' : (newScore >= 50 ? 'yellow' : 'red')}`;
-            }
-            if (stamp) {
-                stamp.textContent = isApprovedNow ? 'APROBADO' : 'NO APROBADO';
-                stamp.className = isApprovedNow ? 'approved-stamp' : 'not-approved-stamp';
-            }
-        });
-    }
-    
+    // Desplazar a la parte superior del informe
     window.scrollTo(0, 0);
 }
 
-function generateDetailedSectionsHTML(scores) {
-    let html = '';
-    [2,4,5,6,7,8,9,10,11,12].forEach(sec => {
-        const isCritical = sec === 4 || sec === 7;
-        html += `
-            <div class="subsection">
-                <h3>${sectionNames[sec]} ${isCritical ? '<span style="color: var(--bad);">(Crítica)</span>' : ''}</h3>
-                <div class="color-legend">
-                    <div class="legend-item"><div class="legend-color green"></div><span data-tooltip="${getTooltipText(sec, 'Bueno').replace(/"/g, '&quot;')}">Bueno</span></div>
-                    <div class="legend-item"><div class="legend-color yellow"></div><span data-tooltip="${getTooltipText(sec, 'Regular').replace(/"/g, '&quot;')}">Regular</span></div>
-                    <div class="legend-item"><div class="legend-color red"></div><span data-tooltip="${getTooltipText(sec, 'Malo').replace(/"/g, '&quot;')}">Malo</span></div>
-                    <div class="legend-item"><div class="legend-color gray"></div><span data-tooltip="${getTooltipText(sec, 'N/A').replace(/"/g, '&quot;')}">No Aplica</span></div>
-                </div>
-                <div class="${sec === 6 || sec === 5 || sec === 9 || sec === 10 ? 'checklist-full' : 'checklist'}">
-                    ${generateChecklistItems(sec)}
-                </div>
-                <div class="score-card">
-                    <div class="score-label">Puntuación ${sectionNames[sec]}</div>
-                    <div class="score-value">${scores[sec]}%</div>
-                    <div class="gauge"><div class="gauge-value" style="left: ${scores[sec]}%;" data-value="${scores[sec]}"></div></div>
-                </div>
-            </div>
-        `;
-    });
-    return html;
-}
-
-function generateChecklistItems(sectionId) {
-    if (!sectionQuestions[sectionId]) return '';
-    let html = '';
-    sectionQuestions[sectionId].forEach(q => {
-        const el = document.getElementById(q.id);
-        if (!el) return;
-        const val = el.value;
-        let statusClass = '', statusText = '', tooltip = '';
-        if (val === 'Bueno' || val === 'Sí') { 
-            statusClass = 'status-good'; 
-            statusText = '✓'; 
-            tooltip = getTooltipText(sectionId, 'Bueno');
-        } else if (val === 'Regular') { 
-            statusClass = 'status-regular'; 
-            statusText = '~'; 
-            tooltip = getTooltipText(sectionId, 'Regular');
-        } else if (val === 'Malo' || val === 'No') { 
-            statusClass = 'status-bad'; 
-            statusText = '✗'; 
-            tooltip = getTooltipText(sectionId, 'Malo');
-        } else { 
-            statusClass = 'status-na'; 
-            statusText = 'N/A'; 
-            tooltip = getTooltipText(sectionId, 'N/A');
-        }
-        html += `<div class="check-item"><div class="status ${statusClass}" data-tooltip="${tooltip.replace(/"/g, '&quot;')}">${statusText}</div><div>${q.text}</div></div>`;
-    });
-    return html;
-}
-
+// Función para generar gráficas de valores comerciales
 function generateCommercialValuesHTML() {
-    const market = parseFloat(document.getElementById('marketValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const fasecolda = parseFloat(document.getElementById('fasecoldaValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const expert = parseFloat(document.getElementById('expertValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const accessories = parseFloat(document.getElementById('accessoriesValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const maxVal = Math.max(market, fasecolda, expert, accessories) || 1;
+    const marketValue = parseFloat(document.getElementById('marketValue').value.replace(/[^0-9.]/g, '')) || 0;
+    const fasecoldaValue = parseFloat(document.getElementById('fasecoldaValue').value.replace(/[^0-9.]/g, '')) || 0;
+    const expertValue = parseFloat(document.getElementById('expertValue').value.replace(/[^0-9.]/g, '')) || 0;
+    const accessoriesValue = parseFloat(document.getElementById('accessoriesValue').value.replace(/[^0-9.]/g, '')) || 0;
+    
+    // Calcular valores mínimo, máximo y promedio
+    const values = [marketValue, fasecoldaValue, expertValue].filter(v => v > 0);
+    const minValue = values.length > 0 ? Math.min(...values) : 0;
+    const maxValue = values.length > 0 ? Math.max(...values) : 0;
+    const avgValue = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+    
     return `
-        <div class="value-chart"><div class="value-label"><span>Revista Motor</span><span>${formatCurrency(market)}</span></div><div class="value-bar-container"><div class="value-bar" id="marketBar" style="width: 0%">0%</div></div></div>
-        <div class="value-chart"><div class="value-label"><span>Fasecolda</span><span>${formatCurrency(fasecolda)}</span></div><div class="value-bar-container"><div class="value-bar" id="fasecoldaBar" style="width: 0%">0%</div></div></div>
-        <div class="value-chart"><div class="value-label"><span>PeritoExpert</span><span>${formatCurrency(expert)}</span></div><div class="value-bar-container"><div class="value-bar" id="expertBar" style="width: 0%">0%</div></div></div>
-        <div class="value-chart"><div class="value-label"><span>Accesorios</span><span>${formatCurrency(accessories)}</span></div><div class="value-bar-container"><div class="value-bar" id="accessoriesBar" style="width: 0%">0%</div></div></div>
+        <div class="value-chart">
+            <div class="value-label">
+                <span>Revista Motor</span>
+                <span id="marketValueDisplay">${formatCurrency(marketValue)}</span>
+            </div>
+            <div class="value-bar-container">
+                <div class="value-bar" id="marketBar" style="width: 0%">0%</div>
+            </div>
+        </div>
+        <div class="value-chart">
+            <div class="value-label">
+                <span>Fasecolda</span>
+                <span id="fasecoldaValueDisplay">${formatCurrency(fasecoldaValue)}</span>
+            </div>
+            <div class="value-bar-container">
+                <div class="value-bar" id="fasecoldaBar" style="width: 0%">0%</div>
+            </div>
+        </div>
+        <div class="value-chart">
+            <div class="value-label">
+                <span>Peritoexpert.com</span>
+                <span id="expertValueDisplay">${formatCurrency(expertValue)}</span>
+            </div>
+            <div class="value-bar-container">
+                <div class="value-bar" id="expertBar" style="width: 0%">0%</div>
+            </div>
+        </div>
+        <div class="value-chart">
+            <div class="value-label">
+                <span>Accesorios</span>
+                <span id="accessoriesValueDisplay">${formatCurrency(accessoriesValue)}</span>
+            </div>
+            <div class="value-bar-container">
+                <div class="value-bar" id="accessoriesBar" style="width: 0%">0%</div>
+            </div>
+        </div>
+        <div class="value-comparison">
+            <div class="value-min">Mínimo: <span id="minValue">${formatCurrency(minValue)}</span></div>
+            <div class="value-average">Promedio: <span id="avgValue">${formatCurrency(avgValue)}</span></div>
+            <div class="value-max">Máximo: <span id="maxValue">${formatCurrency(maxValue)}</span></div>
+        </div>
     `;
 }
 
+// Función para animar gráficas de valores comerciales
 function animateCommercialValues() {
-    const market = parseFloat(document.getElementById('marketValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const fasecolda = parseFloat(document.getElementById('fasecoldaValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const expert = parseFloat(document.getElementById('expertValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const accessories = parseFloat(document.getElementById('accessoriesValue').value.replace(/[^0-9.]/g, '')) || 0;
-    const maxVal = Math.max(market, fasecolda, expert, accessories) || 1;
+    const marketValue = parseFloat(document.getElementById('marketValue').value.replace(/[^0-9.]/g, '')) || 0;
+    const fasecoldaValue = parseFloat(document.getElementById('fasecoldaValue').value.replace(/[^0-9.]/g, '')) || 0;
+    const expertValue = parseFloat(document.getElementById('expertValue').value.replace(/[^0-9.]/g, '')) || 0;
+    const accessoriesValue = parseFloat(document.getElementById('accessoriesValue').value.replace(/[^0-9.]/g, '')) || 0;
+    
+    // Calcular porcentajes para las barras
+    const maxBarValue = Math.max(marketValue, fasecoldaValue, expertValue, accessoriesValue) || 1;
+    
+    const marketPercent = (marketValue / maxBarValue) * 100;
+    const fasecoldaPercent = (fasecoldaValue / maxBarValue) * 100;
+    const expertPercent = (expertValue / maxBarValue) * 100;
+    const accessoriesPercent = (accessoriesValue / maxBarValue) * 100;
+    
+    // Animar las barras
     setTimeout(() => {
-        const setBar = (id, val) => { const bar = document.getElementById(id); if (bar) { bar.style.width = `${(val / maxVal) * 100}%`; bar.textContent = `${Math.round((val / maxVal) * 100)}%`; } };
-        setBar('marketBar', market); setBar('fasecoldaBar', fasecolda); setBar('expertBar', expert); setBar('accessoriesBar', accessories);
+        const marketBar = document.getElementById('marketBar');
+        const fasecoldaBar = document.getElementById('fasecoldaBar');
+        const expertBar = document.getElementById('expertBar');
+        const accessoriesBar = document.getElementById('accessoriesBar');
+        
+        if (marketBar) {
+            marketBar.style.width = `${marketPercent}%`;
+            marketBar.textContent = `${Math.round(marketPercent)}%`;
+        }
+        if (fasecoldaBar) {
+            fasecoldaBar.style.width = `${fasecoldaPercent}%`;
+            fasecoldaBar.textContent = `${Math.round(fasecoldaPercent)}%`;
+        }
+        if (expertBar) {
+            expertBar.style.width = `${expertPercent}%`;
+            expertBar.textContent = `${Math.round(expertPercent)}%`;
+        }
+        if (accessoriesBar) {
+            accessoriesBar.style.width = `${accessoriesPercent}%`;
+            accessoriesBar.textContent = `${Math.round(accessoriesPercent)}%`;
+        }
     }, 500);
 }
 
+// Función para generar items de checklist
+function generateChecklistItems(sectionId) {
+    if (!sectionQuestions[sectionId]) return '';
+    
+    let html = '';
+    sectionQuestions[sectionId].forEach(question => {
+        const element = document.getElementById(question.id);
+        if (!element) return;
+        
+        const value = element.value;
+        let statusClass = '';
+        let statusText = '';
+        
+        if (value === 'Bueno' || value === 'Sí') {
+            statusClass = 'status-good';
+            statusText = '✓';
+        } else if (value === 'Regular') {
+            statusClass = 'status-regular';
+            statusText = '~';
+        } else if (value === 'Malo' || value === 'No') {
+            statusClass = 'status-bad';
+            statusText = '✗';
+        } else {
+            statusClass = 'status-na';
+            statusText = 'N/A';
+        }
+        
+        html += `
+            <div class="check-item">
+                <div class="status ${statusClass}">${statusText}</div>
+                <div>${question.text}</div>
+            </div>
+        `;
+    });
+    
+    return html;
+}
+
+// Función para cargar imágenes en el informe
 function loadReportImages() {
-    ['Front', 'Side', 'Rear', 'Engine'].forEach(id => {
+    const photoIds = ['Front', 'Side', 'Rear', 'Engine'];
+    
+    photoIds.forEach(id => {
         const input = document.getElementById(`photo${id}`);
-        const img = document.getElementById(`reportPhoto${id}`);
-        if (input?.files?.[0] && img) {
+        const reportImg = document.getElementById(`reportPhoto${id}`);
+        
+        if (input && input.files && input.files[0] && reportImg) {
             const reader = new FileReader();
-            reader.onload = e => img.src = e.target.result;
+            reader.onload = function(e) {
+                reportImg.src = e.target.result;
+            };
             reader.readAsDataURL(input.files[0]);
-        } else if (img) {
-            img.parentElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%;">Sin imagen</div>';
+        } else if (reportImg && reportImg.parentElement) {
+            reportImg.parentElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%;">Sin imagen</div>';
         }
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Función para calcular puntajes con penalización por secciones críticas
+function calculateScores() {
+    const scores = {};
+    
+    // Calcular puntuación para cada sección
+    for (const sectionId in sectionQuestions) {
+        if (sectionQuestions.hasOwnProperty(sectionId)) {
+            let totalScore = 0;
+            let answeredQuestions = 0;
+            
+            sectionQuestions[sectionId].forEach(question => {
+                const element = document.getElementById(question.id);
+                if (!element) return;
+                
+                const value = element.value;
+                let points = 0;
+                
+                if (value === 'Bueno' || value === 'Sí') {
+                    points = 100;
+                    answeredQuestions++;
+                } else if (value === 'Regular') {
+                    points = 60;
+                    answeredQuestions++;
+                } else if (value === 'Malo' || value === 'No') {
+                    points = 0;
+                    answeredQuestions++;
+                } else if (value === 'N/A') {
+                    points = 0;
+                }
+                
+                totalScore += points;
+            });
+            
+            // Calcular promedio solo con las preguntas respondidas (no N/A)
+            scores[sectionId] = answeredQuestions > 0 ? Math.round(totalScore / answeredQuestions) : 0;
+        }
+    }
+    
+    return scores;
+}
+
+// Función para calcular puntuación global con penalización por secciones críticas
+function calculateGlobalScore(sectionScores) {
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+    
+    // Penalización adicional si las secciones críticas están mal
+    let criticalPenalty = 0;
+    
+    for (const section in sectionScores) {
+        if (sectionWeights[section]) {
+            let sectionScore = sectionScores[section];
+            
+            // Penalización especial para secciones críticas
+            if (section == 4 || section == 7) { // Fugas y Motor
+                if (sectionScore < 50) {
+                    // Penalización severa: reducción del 30%
+                    sectionScore = Math.max(0, sectionScore - 30);
+                    criticalPenalty += 15;
+                } else if (sectionScore < 70) {
+                    // Penalización moderada: reducción del 15%
+                    sectionScore = Math.max(0, sectionScore - 15);
+                    criticalPenalty += 10;
+                }
+            }
+            
+            totalWeightedScore += sectionScore * sectionWeights[section];
+            totalWeight += sectionWeights[section];
+        }
+    }
+    
+    const baseScore = totalWeight > 0 ? Math.round(totalWeightedScore / totalWeight) : 0;
+    
+    // Aplicar penalización adicional
+    const finalScore = Math.max(0, baseScore - criticalPenalty);
+    
+    console.log(`Puntuación base: ${baseScore}%, Penalización crítica: ${criticalPenalty}%, Puntuación final: ${finalScore}%`);
+    
+    return finalScore;
+}
+
+// Configurar previsualización de imágenes
+document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.photo-upload').forEach(input => {
         input.addEventListener('change', function() {
-            const preview = document.getElementById('preview' + this.id.replace('photo', ''));
-            if (this.files?.[0] && preview) {
+            const previewId = 'preview' + this.id.replace('photo', '');
+            const preview = document.getElementById(previewId);
+            
+            if (this.files && this.files[0] && preview) {
                 const reader = new FileReader();
-                reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
                 reader.readAsDataURL(this.files[0]);
             }
         });
     });
 });
 
-// Función para guardar PDF
-async function saveAsPDF() {
+// Función para guardar como PDF - VERSIÓN CORREGIDA (sin hojas en blanco)
+// Función para guardar como PDF - VERSIÓN CON FORMATO FIJO
+async function saveAsPDF(event) {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
+    const cleanPlate = plate.replace(/[^a-zA-Z0-9]/g, '');
     
+    // Guardar referencia a los botones
+    const actionButtons = element.querySelector('.action-buttons');
+    let originalDisplay = '';
+    if (actionButtons) {
+        originalDisplay = actionButtons.style.display;
+        actionButtons.style.display = 'none';
+    }
+    
+    // Cambiar texto del botón
     const btn = event.currentTarget;
     const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
     btn.disabled = true;
     
-    const actionButtons = document.querySelector('.action-buttons');
-    if (actionButtons) actionButtons.style.display = 'none';
-    
     try {
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
-        const cloneElement = element.cloneNode(true);
-        cloneElement.style.position = 'absolute';
-        cloneElement.style.top = '-9999px';
-        cloneElement.style.left = '-9999px';
-        cloneElement.style.width = '800px';
-        cloneElement.style.backgroundColor = '#ffffff';
-        document.body.appendChild(cloneElement);
+        // Forzar un ancho fijo para el canvas
+        const originalWidth = element.style.width;
+        element.style.width = '1100px';
         
-        const cloneButtons = cloneElement.querySelectorAll('.action-buttons, .btn-action');
-        cloneButtons.forEach(btn => btn.style.display = 'none');
-        
-        const canvas = await html2canvas(cloneElement, {
-            scale: 2,
+        const canvas = await html2canvas(element, {
+            scale: 2.5,
             useCORS: true,
             backgroundColor: '#ffffff',
             logging: false,
-            windowWidth: cloneElement.scrollWidth,
-            windowHeight: cloneElement.scrollHeight
+            windowWidth: 1100,
+            width: 1100
         });
         
-        document.body.removeChild(cloneElement);
+        // Restaurar el ancho original
+        element.style.width = originalWidth;
         
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const { jsPDF } = window.jspdf;
-        
-        const imgWidth = 210;
-        const pageHeight = 297;
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const imgWidth = 190;
+        const pageHeight = 277;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
-        let pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        });
         
-        let position = 0;
         let heightLeft = imgHeight;
+        let position = 0;
         
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        doc.addImage(imgData, 'JPEG', 10, position + 10, imgWidth, imgHeight);
         heightLeft -= pageHeight;
         
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            doc.addPage();
+            doc.addImage(imgData, 'JPEG', 10, position + 10, imgWidth, imgHeight);
             heightLeft -= pageHeight;
         }
         
-        pdf.save(`Peritaje_${plate}_${date}.pdf`);
+        doc.save(`Peritaje_${cleanPlate}_${date}.pdf`);
         
-        if (actionButtons) actionButtons.style.display = 'flex';
+        if (actionButtons) {
+            actionButtons.style.display = originalDisplay || 'flex';
+        }
         btn.innerHTML = originalHTML;
         btn.disabled = false;
         
     } catch (error) {
         console.error('Error:', error);
-        if (actionButtons) actionButtons.style.display = 'flex';
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-        alert('Error al generar PDF. Por favor intente nuevamente.');
-    }
-}
-
-async function saveToDevice() {
-    const element = document.getElementById('finalReport');
-    const plate = document.getElementById('vehiclePlate').value || 'reporte';
-    const date = new Date().toISOString().split('T')[0];
-    
-    const btn = event.currentTarget;
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
-    btn.disabled = true;
-    
-    const actionButtons = document.querySelector('.action-buttons');
-    if (actionButtons) actionButtons.style.display = 'none';
-    
-    try {
-        await new Promise(r => setTimeout(r, 300));
-        
-        const cloneElement = element.cloneNode(true);
-        cloneElement.style.position = 'absolute';
-        cloneElement.style.top = '-9999px';
-        cloneElement.style.left = '-9999px';
-        cloneElement.style.width = '800px';
-        cloneElement.style.backgroundColor = '#ffffff';
-        document.body.appendChild(cloneElement);
-        
-        const cloneButtons = cloneElement.querySelectorAll('.action-buttons, .btn-action');
-        cloneButtons.forEach(btn => btn.style.display = 'none');
-        
-        const canvas = await html2canvas(cloneElement, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff',
-            logging: false,
-            windowWidth: cloneElement.scrollWidth,
-            windowHeight: cloneElement.scrollHeight
-        });
-        
-        document.body.removeChild(cloneElement);
-        
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const { jsPDF } = window.jspdf;
-        
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        let pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-        
-        let position = 0;
-        let heightLeft = imgHeight;
-        
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+        if (actionButtons) {
+            actionButtons.style.display = originalDisplay || 'flex';
         }
-        
-        pdf.save(`Peritaje_${plate}_${date}.pdf`);
-        
-        if (actionButtons) actionButtons.style.display = 'flex';
         btn.innerHTML = originalHTML;
         btn.disabled = false;
-        alert('✅ Informe guardado exitosamente en tu dispositivo.');
-        
-    } catch (error) {
-        console.error('Error:', error);
-        if (actionButtons) actionButtons.style.display = 'flex';
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-        alert('❌ Error al guardar el informe.');
+        alert('Error al generar PDF: ' + error.message);
     }
 }
 
-function printReport() { 
-    window.print(); 
+// Función para imprimir el reporte
+function printReport() {
+    window.print();
 }
 
+// Función para nueva evaluación
 function newEvaluation() {
-    document.getElementById('evaluationForm').reset();
-    document.getElementById('evaluationForm').style.display = 'block';
-    document.getElementById('finalReport').style.display = 'none';
-    document.getElementById('finalReport').innerHTML = '';
-    currentSection = 1;
-    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-    document.getElementById('section-1').classList.add('active');
-    document.getElementById('progressBar').style.width = '7.7%';
-    document.querySelectorAll('.photo-preview').forEach(p => { p.style.display = 'none'; p.src = ''; });
-    window.scrollTo(0, 0);
-    document.querySelectorAll('select, input').forEach(e => e.style.borderColor = '#ddd');
-    document.querySelectorAll('.validation-error').forEach(e => e.style.display = 'none');
+    if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+        // Resetear formulario
+        document.getElementById('evaluationForm').reset();
+        document.getElementById('evaluationForm').style.display = 'block';
+        document.getElementById('finalReport').style.display = 'none';
+        document.getElementById('finalReport').innerHTML = '';
+        
+        // Resetear sección actual
+        currentSection = 1;
+        document.querySelectorAll('.form-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('section-1').classList.add('active');
+        document.getElementById('progressBar').style.width = '7.7%';
+        
+        // Resetear preview de imágenes
+        document.querySelectorAll('.photo-preview').forEach(preview => {
+            preview.style.display = 'none';
+            preview.src = '';
+        });
+        
+        // Scroll al inicio
+        window.scrollTo(0, 0);
+        
+        // Resetear bordes de validación
+        document.querySelectorAll('select, input').forEach(element => {
+            element.style.borderColor = '#ddd';
+        });
+        
+        // Ocultar errores de validación
+        document.querySelectorAll('.validation-error').forEach(error => {
+            error.style.display = 'none';
+        });
+    }
 }
