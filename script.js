@@ -1091,14 +1091,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Función para guardar como PDF - VERSIÓN CORREGIDA (sin hojas en blanco)
-// Función para guardar como PDF - VERSIÓN CON FORMATO FIJO
+// Versión alternativa con márgenes ajustables
 async function saveAsPDF(event) {
     const element = document.getElementById('finalReport');
     const plate = document.getElementById('vehiclePlate').value || 'reporte';
     const date = new Date().toISOString().split('T')[0];
     const cleanPlate = plate.replace(/[^a-zA-Z0-9]/g, '');
     
-    // Guardar referencia a los botones
     const actionButtons = element.querySelector('.action-buttons');
     let originalDisplay = '';
     if (actionButtons) {
@@ -1106,7 +1105,6 @@ async function saveAsPDF(event) {
         actionButtons.style.display = 'none';
     }
     
-    // Cambiar texto del botón
     const btn = event.currentTarget;
     const originalHTML = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
@@ -1115,26 +1113,14 @@ async function saveAsPDF(event) {
     try {
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Forzar un ancho fijo para el canvas
-        const originalWidth = element.style.width;
-        element.style.width = '1100px';
-        
         const canvas = await html2canvas(element, {
-            scale: 2.5,
+            scale: 3,
             useCORS: true,
             backgroundColor: '#ffffff',
-            logging: false,
-            windowWidth: 1100,
-            width: 1100
+            logging: false
         });
         
-        // Restaurar el ancho original
-        element.style.width = originalWidth;
-        
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        const imgWidth = 190;
-        const pageHeight = 277;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
@@ -1143,16 +1129,23 @@ async function saveAsPDF(event) {
             orientation: 'portrait'
         });
         
+        // Márgenes izquierdo y derecho (5mm cada uno)
+        const marginLeft = 5;
+        const marginRight = 5;
+        const imgWidth = doc.internal.pageSize.getWidth() - marginLeft - marginRight; // 200mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pageHeight = doc.internal.pageSize.getHeight();
+        
         let heightLeft = imgHeight;
         let position = 0;
         
-        doc.addImage(imgData, 'JPEG', 10, position + 10, imgWidth, imgHeight);
+        doc.addImage(imgData, 'JPEG', marginLeft, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
         
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
             doc.addPage();
-            doc.addImage(imgData, 'JPEG', 10, position + 10, imgWidth, imgHeight);
+            doc.addImage(imgData, 'JPEG', marginLeft, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
         }
         
